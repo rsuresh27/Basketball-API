@@ -13,7 +13,7 @@ namespace Basketball_API.Repositories
     {
         public async Task<double> GetStat(string player, string stat)
         {
-            return await FilterToSingleStat(player, stat); 
+            return await GetSingleStat(player, stat); 
         }
 
         private static async Task<Stats> LoadPlayerStats(string player)
@@ -32,6 +32,7 @@ namespace Basketball_API.Repositories
                     throw new Exception("Invalid name"); 
                 }
 
+                //format name to match basketball-reference query string
                 string playerFirstNameSearch = player.Split(' ').ElementAt(0).Substring(0, 2).ToLower();
 
                 string playerLastNameSearch = player.Split(' ').ElementAt(1).Length > 5 ? player.Split(' ').ElementAt(1).Substring(0, 5).ToLower() : player.Split(' ').ElementAt(1).ToLower();
@@ -44,6 +45,7 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
+                //load webpage and get html within the webpage to parse for stats
                 using (HttpClient client = new HttpClient())
                 {
                     using (HttpResponseMessage httpResponse = client.GetAsync(url).Result)
@@ -57,16 +59,15 @@ namespace Basketball_API.Repositories
                             }
                         }
 
-                        //if basketball-reference returns any error code at or above 400, the players name was not typed correctly
+                        //if basketball-reference returns any error code at or above 400, the players name was not typed correctly or something is wrong with basketball-references website
                         else if(Convert.ToInt32(httpResponse.StatusCode) >= 400)
                         {
-                            throw new Exception("An error occurred getting the stats, please check you typed the players name correctly"); 
+                            throw new Exception("An error occurred getting the stats, please check you typed the players name correctly or try again later"); 
                         }
                     }
                 }
 
                 //get div that contains the info we need
-                //var nodes = doc.GetElementbyId("info").DescendantsAndSelf();
                 var content = htmlDocument.GetElementbyId("content")?.ChildNodes;
 
 
@@ -74,7 +75,7 @@ namespace Basketball_API.Repositories
                 var tableContainer = GetChildNodes(content, "all_per_game-playoffs_per_game");
 
 
-                //if a player hasnt been to the playoffs, we need to go down a different path 
+                //if a player hasnt been to the playoffs, we need to go down a different path within the html because the eleme
                 //switcher will have two tabs if a player has gone to the playoffs vs one for a person that hasnt gone, so we count the number of tabs in the switcher to know where to go 
                 var playoffSwitcher = tableContainer.Where(node => node.GetAttributeValue("class", "").Contains("filter switcher")).Select(node => node).FirstOrDefault();
 
@@ -148,7 +149,7 @@ namespace Basketball_API.Repositories
             }
         }
 
-        private static async Task<double> FilterToSingleStat(string player, string statToSearch)
+        private static async Task<double> GetSingleStat(string player, string statToSearch)
         {
             try
             {
