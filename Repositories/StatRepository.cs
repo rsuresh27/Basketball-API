@@ -154,6 +154,7 @@ namespace Basketball_API.Repositories
             {
                 var stats = await LoadPlayerStats(player);
 
+                //basketball-reference uses different terms for rebounds and turnovers, so if the request wants rebounds or turnovers then replace it with the correct term 
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "reb", "trb");
 
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "to", "tov");
