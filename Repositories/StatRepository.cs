@@ -161,9 +161,7 @@ namespace Basketball_API.Repositories
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "reb", "trb");
 
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "to", "tov");
-
-                Console.Write(statToSearch);
-
+            
                 var statId = stats.StatNameToStatId.Where(stat => stat.Key.Contains(statToSearch)).Select(selectedStat => selectedStat.Value).FirstOrDefault();
 
                 if (statId.Count() < 1)
