@@ -22,13 +22,13 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetStat(string player, string stat)
+        public IActionResult GetStat(string player, string stat, string year = null)
         {
             try
             {
                 if(!string.IsNullOrEmpty(player) && !string.IsNullOrEmpty(stat))
                 {
-                    var statValue = _statsRepository.GetStat(player, stat);
+                    var statValue = _statsRepository.GetStat(player, stat, year);
                     return Ok(statValue); 
                 }
                 else
@@ -40,6 +40,28 @@ namespace Basketball_API.Controllers
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
                 return StatusCode(500); 
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetAllStats(string player, string year = null)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(player))
+                {
+                    var statValue = _statsRepository.GetSeasonStats(player, year);
+                    return Ok(statValue);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500);
             }
         }
         

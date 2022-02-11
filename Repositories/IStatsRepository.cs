@@ -7,7 +7,8 @@ namespace Basketball_API.Repositories
 {
     public interface IStatsRepository
     {
-        public Task<double> GetStat(string player, string stat); 
+        public Task<double> GetStat(string player, string stat, string year = null);
 
+        public Task<Dictionary<string, string>> GetSeasonStats(string player, string year = null); 
     }
 }

@@ -11,15 +11,22 @@ namespace Basketball_API.Repositories
 {
     public class StatRepository : IStatsRepository
     {
-        public async Task<double> GetStat(string player, string stat)
+        public async Task<double> GetStat(string player, string stat, string year = null)
         {
-            return await GetSingleStat(player, stat);
+            return await GetSingleStat(player, stat, year);
+        }
+
+        public async Task<Dictionary<string, string>> GetSeasonStats(string player, string year = null)
+        {
+            return await GetCurrentSeasonStats(player, year); 
         }
 
         private static async Task<Stats> LoadPlayerStats(string player)
         {
             try
             {
+                player = player.Trim(); 
+
                 //this list will hold player stats for entire career
                 List<SingleYearStats> playerStats = new List<SingleYearStats>();
 
@@ -149,7 +156,7 @@ namespace Basketball_API.Repositories
             }
         }
 
-        private static async Task<double> GetSingleStat(string player, string statToSearch)
+        private static async Task<double> GetSingleStat(string player, string statToSearch, string year)
         {
             try
             {
@@ -169,12 +176,61 @@ namespace Basketball_API.Repositories
                     throw new Exception("Invalid stat");
                 }
 
+                var yearsList = stats.PlayerStats.ToList().Select(year => Convert.ToInt32(year.Year.Split('.').ElementAt(1)));
+
+                if (yearsList.Min() > Convert.ToInt32(year))
+                {
+                    throw new Exception("Player was not playing in NBA during this season");
+                }
+
+                if (yearsList.Max() < Convert.ToInt32(year))
+                {
+                    throw new Exception("Invalid NBA Season");
+                }
+
+                year = year.Trim(); 
+
                 //only get stats for current season (2022 in this case)
-                var yearStats = stats.PlayerStats.Where(year => year.Year.Contains("2022")).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
+                var yearStats = stats.PlayerStats.Where(statYear => statYear.Year.Contains(year ?? Convert.ToString(DateTime.Today.Year))).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
 
                 return yearStats.Where(stat => stat.Key == statId).Select(statValue => Convert.ToDouble(statValue.Value)).FirstOrDefault();
             }
             catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        private async Task<Dictionary<string, string>> GetCurrentSeasonStats(string player, string year)
+        {
+
+            try
+            {
+                var stats = await LoadPlayerStats(player);
+
+                var currentSeasonStats = new Dictionary<string, string>();
+
+                var yearsList = stats.PlayerStats.ToList().Select(year => Convert.ToInt32(year.Year.Split('.').ElementAt(1)));
+
+                if (yearsList.Min() > Convert.ToInt32(year))
+                {
+                    throw new Exception("Player was not playing in NBA during this season");
+                }
+
+                if(yearsList.Max() < Convert.ToInt32(year))
+                {
+                    throw new Exception("Invalid NBA Season"); 
+                }
+
+                year = year.Trim();
+
+                var yearStats = stats.PlayerStats.Where(statYear => statYear.Year.Contains(year ?? Convert.ToString(DateTime.Today.Year))).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
+
+                yearStats.ToList().ForEach(stat => currentSeasonStats.Add(stats.StatNameToStatId.Where(statIds => statIds.Value == stat.Key).Select(statId => statId.Key).FirstOrDefault(), stat.Value));
+
+                return currentSeasonStats;
+            }
+            catch(Exception ex)
             {
                 throw new Exception(ex.Message, ex);
             }
