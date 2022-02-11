@@ -8,9 +8,9 @@ namespace Basketball_API.Models
     public struct Stats
     {
         public Dictionary<string, string> StatNameToStatId { get; set; }
-        public Dictionary<string, Dictionary<string, string>> PlayerStats { get; set; }
+        public List<SingleYearStats> PlayerStats { get; set; }
 
-        public Stats(Dictionary<string, string> statNameToStatId, Dictionary<string, Dictionary<string, string>> playerStats)
+        public Stats(Dictionary<string, string> statNameToStatId, List<SingleYearStats> playerStats)
         {
             StatNameToStatId = statNameToStatId;
             PlayerStats = playerStats; 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
 using System.Net.Http;
-using Basketball_API.Models; 
+using Basketball_API.Models;
 
 namespace Basketball_API.Repositories
 {
@@ -13,23 +13,23 @@ namespace Basketball_API.Repositories
     {
         public async Task<double> GetStat(string player, string stat)
         {
-            return await GetSingleStat(player, stat); 
+            return await GetSingleStat(player, stat);
         }
 
         private static async Task<Stats> LoadPlayerStats(string player)
         {
             try
             {
-                //this dict will hold player stats for entire career
-                Dictionary<string, Dictionary<string, string>> playerStats = new Dictionary<string, Dictionary<string, string>>();
+                //this list will hold player stats for entire career
+                List<SingleYearStats> playerStats = new List<SingleYearStats>();
 
                 //this dict will map all common stat abbreviations to stat ids that are used by basketball-reference.com
                 Dictionary<string, string> statToStatId = new Dictionary<string, string>();
 
                 //player must have first and last name 
-                if(player.Split(' ').Count() != 2)
+                if (player.Split(' ').Count() != 2)
                 {
-                    throw new Exception("Invalid name"); 
+                    throw new Exception("Invalid name");
                 }
 
                 //format name to match basketball-reference query string
@@ -50,7 +50,7 @@ namespace Basketball_API.Repositories
                 {
                     using (HttpResponseMessage httpResponse = client.GetAsync(url).Result)
                     {
-                        if(httpResponse.IsSuccessStatusCode)
+                        if (httpResponse.IsSuccessStatusCode)
                         {
                             using (HttpContent httpContent = httpResponse.Content)
                             {
@@ -60,9 +60,9 @@ namespace Basketball_API.Repositories
                         }
 
                         //if basketball-reference returns any error code at or above 400, the players name was not typed correctly or something is wrong with basketball-references website
-                        else if(Convert.ToInt32(httpResponse.StatusCode) >= 400)
+                        else if (Convert.ToInt32(httpResponse.StatusCode) >= 400)
                         {
-                            throw new Exception("An error occurred getting the stats, please check you typed the players name correctly or try again later"); 
+                            throw new Exception("An error occurred getting the stats, please check you typed the players name correctly or try again later");
                         }
                     }
                 }
@@ -98,7 +98,7 @@ namespace Basketball_API.Repositories
                 var trowsTbody = regularSeasonStatsTableDiv.Descendants("tr").Where(node => node.ParentNode.XPath.Contains("tbody"));
 
                 //loop through each trow in the table and use the trow id (ex. per_game.2022) value as key for the dictionary
-                trowsTbody.ToList().ForEach(trow => playerStats.Add(trow.Id, new Dictionary<string, string>()));
+                trowsTbody.ToList().ForEach(trow => playerStats.Add(new SingleYearStats(trow.Id, null)));
 
                 //next, get the stat id for each stat from the individual header in the "data-stat" attribute, which is in thead section
                 var thead = regularSeasonStatsTableDiv.Descendants("tr").Where(node => node.ParentNode.XPath.Contains("thead"));
@@ -114,9 +114,9 @@ namespace Basketball_API.Repositories
                 thThead?.ToList().ForEach(th => { seasonStatsIds.Add(th.GetAttributeValue("data-stat", ""), ""); statToStatId.Add(th.InnerText.ToLower(), th.GetAttributeValue("data-stat", "")); });
 
                 //assign new dictionary to each year 
-                foreach (string year in playerStats.Keys)
+                foreach (SingleYearStats singleYear in playerStats)
                 {
-                    playerStats[year] = new Dictionary<string, string>(seasonStatsIds);
+                    singleYear.Stats = new Dictionary<string, string>(seasonStatsIds);
                 }
 
                 //get individual stat for each seaason, which is in td of each tr and match the stat ids
@@ -134,14 +134,14 @@ namespace Basketball_API.Repositories
                         var statId = td.GetAttributeValue("data-stat", "empty");
                         var statValue = td.InnerText;
 
-                        var year = playerStats.Where(year => year.Key == statYear).Select(selectedYear => selectedYear.Value).FirstOrDefault();
+                        var year = playerStats.Where(year => year.Year == statYear).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
 
                         year[statId] = statValue;
                     }
                 }
 
                 //use struct to easily pass both dictionaries in one object
-                return new Stats(statToStatId, playerStats); 
+                return new Stats(statToStatId, playerStats);
             }
             catch (Exception ex)
             {
@@ -156,25 +156,29 @@ namespace Basketball_API.Repositories
                 var stats = await LoadPlayerStats(player);
 
                 //basketball-reference uses different terms for rebounds and turnovers, so if the request wants rebounds or turnovers then replace it with the correct term 
+                statToSearch = statToSearch.Trim();
+
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "reb", "trb");
 
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "to", "tov");
+
+                Console.Write(statToSearch);
 
                 var statId = stats.StatNameToStatId.Where(stat => stat.Key.Contains(statToSearch)).Select(selectedStat => selectedStat.Value).FirstOrDefault();
 
                 if (statId.Count() < 1)
                 {
-                    throw new Exception("Invalid stat"); 
+                    throw new Exception("Invalid stat");
                 }
 
                 //only get stats for current season (2022 in this case)
-                var yearStats = stats.PlayerStats.Where(year => year.Key.Contains("2022")).Select(selectedYear => selectedYear.Value).FirstOrDefault();
+                var yearStats = stats.PlayerStats.Where(year => year.Year.Contains("2022")).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
 
                 return yearStats.Where(stat => stat.Key == statId).Select(statValue => Convert.ToDouble(statValue.Value)).FirstOrDefault();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex); 
+                throw new Exception(ex.Message, ex);
             }
         }
 
