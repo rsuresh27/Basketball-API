@@ -11,6 +11,8 @@ namespace Basketball_API.Repositories
 {
     public class StatRepository : IStatsRepository
     {
+        #region Endpoints
+
         public async Task<double> GetStat(string player, string stat, string year = null)
         {
             return await GetSingleStat(player, stat, year);
@@ -18,14 +20,23 @@ namespace Basketball_API.Repositories
 
         public async Task<Dictionary<string, string>> GetSeasonStats(string player, string year = null)
         {
-            return await GetCurrentSeasonStats(player, year); 
+            return await GetSeasonPlayerStats(player, year);
         }
+
+        public async Task<Dictionary<string, string>> GetTeamSeasonStats(string team, string year = null)
+        {
+            return await GetSeasonTeamStats(team, year);
+        }
+
+        #endregion
+
+        #region Stat Functions
 
         private static async Task<Stats> LoadPlayerStats(string player)
         {
             try
             {
-                player = player.Trim(); 
+                player = player.Trim();
 
                 //this list will hold player stats for entire career
                 List<SingleYearStats> playerStats = new List<SingleYearStats>();
@@ -52,27 +63,7 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                //load webpage and get html within the webpage to parse for stats
-                using (HttpClient client = new HttpClient())
-                {
-                    using (HttpResponseMessage httpResponse = client.GetAsync(url).Result)
-                    {
-                        if (httpResponse.IsSuccessStatusCode)
-                        {
-                            using (HttpContent httpContent = httpResponse.Content)
-                            {
-                                var webPage = await httpContent.ReadAsStringAsync();
-                                htmlDocument.LoadHtml(webPage);
-                            }
-                        }
-
-                        //if basketball-reference returns any error code at or above 400, the players name was not typed correctly or something is wrong with basketball-references website
-                        else if (Convert.ToInt32(httpResponse.StatusCode) >= 400)
-                        {
-                            throw new Exception("An error occurred getting the stats, please check you typed the players name correctly or try again later");
-                        }
-                    }
-                }
+                htmlDocument.LoadHtml(await HttpGet(url));
 
                 //get div that contains the info we need
                 var content = htmlDocument.GetElementbyId("content")?.ChildNodes;
@@ -168,8 +159,10 @@ namespace Basketball_API.Repositories
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "reb", "trb");
 
                 statToSearch = Regex.Replace(statToSearch.ToLower(), "to", "tov");
-            
+
                 var statId = stats.StatNameToStatId.Where(stat => stat.Key.Contains(statToSearch)).Select(selectedStat => selectedStat.Value).FirstOrDefault();
+
+                year ??= Convert.ToString(DateTime.Today.Year);
 
                 if (statId.Count() < 1)
                 {
@@ -188,10 +181,10 @@ namespace Basketball_API.Repositories
                     throw new Exception("Invalid NBA Season");
                 }
 
-                year = year.Trim(); 
+                year = year.Trim();
 
                 //only get stats for current season (2022 in this case)
-                var yearStats = stats.PlayerStats.Where(statYear => statYear.Year.Contains(year ?? Convert.ToString(DateTime.Today.Year))).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
+                var yearStats = stats.PlayerStats.Where(statYear => statYear.Year.Contains(year)).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
 
                 return yearStats.Where(stat => stat.Key == statId).Select(statValue => Convert.ToDouble(statValue.Value)).FirstOrDefault();
             }
@@ -201,7 +194,7 @@ namespace Basketball_API.Repositories
             }
         }
 
-        private async Task<Dictionary<string, string>> GetCurrentSeasonStats(string player, string year)
+        private async Task<Dictionary<string, string>> GetSeasonPlayerStats(string player, string year)
         {
 
             try
@@ -212,33 +205,132 @@ namespace Basketball_API.Repositories
 
                 var yearsList = stats.PlayerStats.ToList().Select(year => Convert.ToInt32(year.Year.Split('.').ElementAt(1)));
 
+                year ??= Convert.ToString(DateTime.Today.Year); 
+
                 if (yearsList.Min() > Convert.ToInt32(year))
                 {
                     throw new Exception("Player was not playing in NBA during this season");
                 }
 
-                if(yearsList.Max() < Convert.ToInt32(year))
+                if (yearsList.Max() < Convert.ToInt32(year))
                 {
-                    throw new Exception("Invalid NBA Season"); 
+                    throw new Exception("Invalid NBA Season");
                 }
 
                 year = year.Trim();
 
-                var yearStats = stats.PlayerStats.Where(statYear => statYear.Year.Contains(year ?? Convert.ToString(DateTime.Today.Year))).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
+                var yearStats = stats.PlayerStats.Where(statYear => statYear.Year.Contains(year)).Select(selectedYear => selectedYear.Stats).FirstOrDefault();
 
                 yearStats.ToList().ForEach(stat => currentSeasonStats.Add(stats.StatNameToStatId.Where(statIds => statIds.Value == stat.Key).Select(statId => statId.Key).FirstOrDefault(), stat.Value));
 
                 return currentSeasonStats;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message, ex);
             }
         }
 
+        private async Task<Dictionary<string, string>> GetSeasonTeamStats(string team, string year = null)
+        {
+            try
+            {
+
+                var url = $"https://www.basketball-reference.com";
+
+                HtmlDocument htmlDocument = new HtmlDocument();
+
+                //load webpage and get html within the webpage to parse for stats
+                htmlDocument.LoadHtml(await HttpGet(url));
+
+                var content = htmlDocument.GetElementbyId("content").ChildNodes.Where(node => node.GetAttributeValue("class", "") == "flexindex").FirstOrDefault();
+
+                var forms = content.Descendants("form").ToList().Where(node => node.GetAttributeValue("class", "") == "srbasic sr_goto no-deserialize concat");
+
+                var teamSelectForm = forms.ToList().Select(node => node.Descendants("select")).FirstOrDefault();
+
+                var nbaTeams = teamSelectForm.Where(node => node.Id == "select_team").FirstOrDefault().ChildNodes;
+
+                var teamUrl = nbaTeams.ToList().Where(teamName => teamName.InnerText.ToLower().Contains(team)).Select(selectedTeam => selectedTeam.GetAttributeValue("value", "")).FirstOrDefault();
+
+                var teamCurrentSeasonStatsUrl = $"{url}{teamUrl}/stats_per_game_totals.html";
+
+                Console.WriteLine(teamCurrentSeasonStatsUrl);
+
+                //team stats 
+                htmlDocument.LoadHtml(await HttpGet(teamCurrentSeasonStatsUrl));
+
+                var teamContent = htmlDocument.GetElementbyId("content").ChildNodes;
+
+                var allStats = GetChildNodes(teamContent, "all_stats");
+
+                var statsDiv = GetChildNodes(allStats, "div_stats");
+
+                var statsTable = GetChildNodes(statsDiv, "stats");
+
+                var statsTableThead = statsTable.Descendants();
+
+                var statTableTh = statsTableThead.ToList().Where(node => node.XPath.Contains("thead")).GroupBy(node => node.GetAttributeValue("data-stat", "")).Select(node => node.FirstOrDefault()).Where(node => node.GetAttributeValue("data-stat", "") != "foo");
+
+                Dictionary<string, string> statIds = statTableTh.AsEnumerable().Where(node => node.GetAttributeValue("data-stat", "") != "").ToDictionary(node => node.GetAttributeValue("data-stat", ""), node => node.InnerText);
+
+                var statTableTbody = statsTableThead.ToList().Where(node => node.XPath.Contains("tbody"));
+
+                var statTableYearColumn = statTableTbody.ToList().Where(node => node.GetAttributeValue("data-stat", "") == "season" && node.InnerText.ToLower() != "season");
+
+                var seasonStatsRow = statTableYearColumn.ToList().Where(node => node.InnerText.Substring(node.InnerText.Length - 2, 2) == (year ?? Convert.ToString(DateTime.Now.Year)).Substring(2, 2)).Select(node => node.ParentNode).FirstOrDefault();
+
+                Dictionary<string, string> stats = seasonStatsRow.ChildNodes.AsEnumerable().Where(node => node.GetAttributeValue("data-stat", "") != "foo").ToDictionary(node => node.GetAttributeValue("data-stat", ""), node => node.InnerText);
+
+                return statIds.Keys.ToList().AsEnumerable().ToDictionary(statId => statIds[statId], statId => stats[statId]);
+            }
+
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        #endregion
+
+        #region Helper functions
+
         private static HtmlNodeCollection GetChildNodes(HtmlNodeCollection htmlNodes, string divID)
         {
             return htmlNodes.Where(node => node?.Id == divID).Select(selectedNode => selectedNode?.ChildNodes).FirstOrDefault();
         }
+
+        private static async Task<string> HttpGet(string url)
+        {
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    using (HttpResponseMessage httpResponse = client.GetAsync(url).Result)
+                    {
+                        if (httpResponse.IsSuccessStatusCode)
+                        {
+                            using (HttpContent httpContent = httpResponse.Content)
+                            {
+                                var webPage = httpContent.ReadAsStringAsync();
+                                return webPage.Result;
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("An error occurred getting the stats, please check you typed the team name correctly or try again later");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+
+        }
+
+        #endregion
+
     }
 }
