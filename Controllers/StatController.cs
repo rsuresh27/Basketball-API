@@ -18,7 +18,7 @@ namespace Basketball_API.Controllers
         public StatController(IStatsRepository statsRepository, ILogger<StatController> logger)
         {
             _statsRepository = statsRepository;
-            _logger = logger; 
+            _logger = logger;
         }
 
         [HttpGet]
@@ -26,20 +26,20 @@ namespace Basketball_API.Controllers
         {
             try
             {
-                if(!string.IsNullOrEmpty(player) && !string.IsNullOrEmpty(stat))
+                if (!string.IsNullOrEmpty(player) && !string.IsNullOrEmpty(stat))
                 {
                     var statValue = _statsRepository.GetStat(player, stat, year);
-                    return Ok(statValue); 
+                    return Ok(statValue);
                 }
                 else
                 {
-                    return BadRequest(); 
+                    return BadRequest();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
-                return StatusCode(500); 
+                return StatusCode(500);
             }
         }
 
@@ -87,5 +87,19 @@ namespace Basketball_API.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetDayTop5Players(string year = "1")
+        {
+            try
+            {
+                var statValue = _statsRepository.GetDayTopPlayers(year);
+                return Ok(statValue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500);
+            }
+        }
     }
 }

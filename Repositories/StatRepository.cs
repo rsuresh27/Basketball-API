@@ -28,6 +28,10 @@ namespace Basketball_API.Repositories
             return await GetSeasonTeamStats(team, year);
         }
 
+        public async Task<List<Dictionary<string, string>>> GetDayTopPlayers(string daysAgo = "1")
+        {
+            return await GetDayTop5Players(daysAgo);
+        }
         #endregion
 
         #region Stat Functions
@@ -196,7 +200,6 @@ namespace Basketball_API.Repositories
 
         private async Task<Dictionary<string, string>> GetSeasonPlayerStats(string player, string year)
         {
-
             try
             {
                 var stats = await LoadPlayerStats(player);
@@ -205,7 +208,7 @@ namespace Basketball_API.Repositories
 
                 var yearsList = stats.PlayerStats.ToList().Select(year => Convert.ToInt32(year.Year.Split('.').ElementAt(1)));
 
-                year ??= Convert.ToString(DateTime.Today.Year); 
+                year ??= Convert.ToString(DateTime.Today.Year);
 
                 if (yearsList.Min() > Convert.ToInt32(year))
                 {
@@ -235,6 +238,9 @@ namespace Basketball_API.Repositories
         {
             try
             {
+                team = team.Trim();
+
+                year = year.Trim(); 
 
                 var url = $"https://www.basketball-reference.com";
 
@@ -291,6 +297,41 @@ namespace Basketball_API.Repositories
             }
         }
 
+        private async Task<List<Dictionary<string, string>>> GetDayTop5Players(string daysAgo)
+        {
+            daysAgo = daysAgo.Trim(); 
+
+            var url = $"https://www.basketball-reference.com/friv/last_n_days.fcgi?n={daysAgo}&type=per_game";
+
+            HtmlDocument htmlDocument = new HtmlDocument();
+
+            htmlDocument.LoadHtml(await HttpGet(url));
+
+            var allPlayersTableDiv = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_players");
+
+            if (allPlayersTableDiv == null)
+            {
+                throw new Exception($"No games played within the past {daysAgo} days");
+            }
+
+            var tableDiv = GetChildNodes(allPlayersTableDiv, "div_players");
+
+            var table = GetChildNodes(tableDiv, "players");
+
+            var thead = table.Descendants("th").Where(node => node.ParentNode.XPath.Contains("thead"));
+
+            List<string> statHighlighs = new List<string> { "pts", "trb", "ast", "player" };
+
+            Dictionary<string, string> statIds = thead.ToList().GroupBy(node => node.GetAttributeValue("data-stat", "")).Where(grouping => statHighlighs.Any(stat => grouping.Key.Contains(stat))).Select(node => node.FirstOrDefault()).AsEnumerable().ToDictionary(node => node.GetAttributeValue("data-stat", ""), node => node.InnerText);
+
+            var tbody = table.Descendants("tr").Where(node => node.ParentNode.XPath.Contains("tbody")).Take(5);
+
+            var stats = tbody.Select(node => node.ChildNodes);
+
+            List<Dictionary<string, string>> playerStats = stats.ToList().Select(player => player.Where(playerStat => statHighlighs.Any(statId => playerStat.GetAttributeValue("data-stat", "").Contains(statId))).AsEnumerable().ToDictionary(node => node.GetAttributeValue("data-stat", ""), node => node.InnerText)).ToList();
+
+            return playerStats;
+        }
         #endregion
 
         #region Helper functions
