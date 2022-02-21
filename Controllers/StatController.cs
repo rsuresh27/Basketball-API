@@ -39,7 +39,7 @@ namespace Basketball_API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
-                return StatusCode(500);
+                return StatusCode(500 , ex.Message);
             }
         }
 
@@ -61,7 +61,7 @@ namespace Basketball_API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
-                return StatusCode(500);
+                return StatusCode(500, ex.Message);
             }
         }
 
@@ -83,22 +83,22 @@ namespace Basketball_API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
-                return StatusCode(500);
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpGet]
-        public IActionResult GetDayTop5Players(string year = "1")
+        public IActionResult GetDayTop5Players(string daysAgo = "1")
         {
             try
             {
-                var statValue = _statsRepository.GetDayTopPlayers(year);
+                var statValue = _statsRepository.GetDayTopPlayers(daysAgo);
                 return Ok(statValue);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
-                return StatusCode(500);
+                return StatusCode(500, ex.Message);
             }
         }
     }
