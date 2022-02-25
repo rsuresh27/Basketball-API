@@ -35,7 +35,8 @@ namespace Basketball_API
             });
 
             //inject repository 
-            services.AddScoped<IStatsRepository, StatRepository>(); 
+            services.AddScoped<IStatsRepository, StatRepository>();
+            services.AddScoped<IStatLeadersRepository, StatLeadersRepository>(); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

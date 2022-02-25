@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Basketball_API.Repositories
@@ -13,6 +11,6 @@ namespace Basketball_API.Repositories
 
         public Task<Dictionary<string, string>> GetTeamSeasonStats(string team, string year = null);
 
-        public Task<List<Dictionary<string, string>>> GetDayTopPlayers(string daysAgo = "0");
+        public Task<List<Dictionary<string, string>>> GetDayTopPlayers(string daysAgo);
     }
 }

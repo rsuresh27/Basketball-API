@@ -22,13 +22,13 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetStat(string player, string stat, string year = null)
+        public async Task<IActionResult> GetStat(string player, string stat, string year = null)
         {
             try
             {
                 if (!string.IsNullOrEmpty(player) && !string.IsNullOrEmpty(stat))
                 {
-                    var statValue = _statsRepository.GetStat(player, stat, year);
+                    var statValue = await _statsRepository.GetStat(player, stat, year);
                     return Ok(statValue);
                 }
                 else
@@ -39,18 +39,18 @@ namespace Basketball_API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
-                return StatusCode(500 , ex.Message);
+                return StatusCode(500, ex.Message);
             }
         }
 
         [HttpGet]
-        public IActionResult GetPlayerStats(string player, string year = null)
+        public async Task<IActionResult> GetPlayerStats(string player, string year = null)
         {
             try
             {
                 if (!string.IsNullOrEmpty(player))
                 {
-                    var statValue = _statsRepository.GetSeasonStats(player, year);
+                    var statValue = await _statsRepository.GetSeasonStats(player, year);
                     return Ok(statValue);
                 }
                 else
@@ -66,13 +66,13 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetTeamStats(string team, string year = null)
+        public async Task<IActionResult> GetTeamStats(string team, string year = null)
         {
             try
             {
                 if (!string.IsNullOrEmpty(team))
                 {
-                    var statValue = _statsRepository.GetTeamSeasonStats(team, year);
+                    var statValue = await _statsRepository.GetTeamSeasonStats(team, year);
                     return Ok(statValue);
                 }
                 else
@@ -88,11 +88,11 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetDayTop5Players(string daysAgo = "1")
+        public async Task<IActionResult> GetDayTop5Players(string daysAgo = "1")
         {
             try
             {
-                var statValue = _statsRepository.GetDayTopPlayers(daysAgo);
+                var statValue = await _statsRepository.GetDayTopPlayers(daysAgo);
                 return Ok(statValue);
             }
             catch (Exception ex)
