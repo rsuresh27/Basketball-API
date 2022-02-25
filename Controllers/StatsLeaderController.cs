@@ -20,7 +20,7 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTop5PlayersPPG(string year = "2022")
+        public async Task<IActionResult> GetTop5PlayersPointsPerGame(string year = "2022")
         {
             try
             {
@@ -34,5 +34,64 @@ namespace Basketball_API.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetTop5PlayersReboundsPerGame(string year = "2022")
+        {
+            try
+            {
+                var statValue = await _statLeadersRepository.GetTopPlayersRPG(year);
+                return Ok(statValue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTop5PlayersAssistsPerGame(string year = "2022")
+        {
+            try
+            {
+                var statValue = await _statLeadersRepository.GetTopPlayersAPG(year);
+                return Ok(statValue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTop5PlayersStealsPerGame(string year = "2022")
+        {
+            try
+            {
+                var statValue = await _statLeadersRepository.GetTopPlayersSPG(year);
+                return Ok(statValue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTop5PlayersBlocksPerGame(string year = "2022")
+        {
+            try
+            {
+                var statValue = await _statLeadersRepository.GetTopPlayersBPG(year);
+                return Ok(statValue);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
     }
 }
