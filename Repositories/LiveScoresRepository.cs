@@ -15,27 +15,27 @@ namespace Basketball_API.Repositories
     {
         #region Endpoint
 
-        public async Task<string> GetGameScore(string gameID)
+        public async Task<string> GetGameScore(string gameID, DateTime? date = null)
         {
             return await GetScoreGame(gameID); 
         }
 
-        public async Task<List<string>> GetGamesToday(DateTime date)
+        public async Task<List<string>> GetGames(DateTime? date = null)
         {
-            return await GetGamesPlayedToday(date); 
+            return await GetGamesPlayed(date); 
         }
 
         #endregion
 
         #region Live Score Functions
 
-        private async Task<string> GetScoreGame(string gameID)
+        private async Task<string> GetScoreGame(string gameID, DateTime? date = null)
         {
             try
             {
-                var today = Regex.Replace(DateTime.Now.ToString("yyyy/MM/dd"), "/", string.Empty);
+                var formattedDate = date.HasValue ? Regex.Replace(date.Value.ToString("yyyy/MM/dd"), "/", string.Empty) : Regex.Replace(DateTime.Now.ToString("yyyy/MM/dd"), "/", string.Empty);
 
-                var url = $"https://www.espn.com/nba/scoreboard/_/date/{today}";
+                var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
@@ -80,6 +80,8 @@ namespace Basketball_API.Repositories
 
                 var playerNames = topPerformers.Descendants("span").Where(node => node.GetAttributeValue("class", "") == "Athlete__PlayerName");
 
+                var playerTeams = topPerformers.Descendants("span").Where(node => node.GetAttributeValue("class", "") == "Athlete__NameDetails ml2 clr-gray-04 di ns9");
+
                 var topPerformersStats = topPerformers.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "Athlete__Stats mt2 clr-gray-04 ns9");
 
                 //use expandoobject to create json 
@@ -104,6 +106,14 @@ namespace Basketball_API.Repositories
                                                                                    node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "clr-gray-01 hs9").InnerText);
                         }
                     }
+
+                    foreach(var team in playerTeams)
+                    {
+                        if(team.ParentNode == player.ParentNode)
+                        {
+                            final.TopPerformers[player.InnerText].Add("TEAM", team.InnerText.Split('-').ElementAtOrDefault(1).Trim()); 
+                        }
+                    }
                 }
 
                 return JsonSerializer.Serialize(final);
@@ -114,13 +124,13 @@ namespace Basketball_API.Repositories
             }
         }
 
-        private async Task<List<string>> GetGamesPlayedToday(DateTime date)
+        private async Task<List<string>> GetGamesPlayed(DateTime? date = null)
         {
             try
             {
-                var today = Regex.Replace(DateTime.Now.ToString("yyyy/MM/dd"), "/", string.Empty);
+                var formattedDate = date.HasValue ? Regex.Replace(date.Value.ToString("yyyy/MM/dd"), "/", string.Empty) : Regex.Replace(DateTime.Now.ToString("yyyy/MM/dd"), "/", string.Empty);
 
-                var url = $"https://www.espn.com/nba/scoreboard/_/date/{today}";
+                var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 

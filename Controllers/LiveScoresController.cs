@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Basketball_API.Repositories;
 using Microsoft.Extensions.Logging;
-using System.Text.Json; 
+using System.Text.Json;
 
 namespace Basketball_API.Controllers
 {
@@ -19,48 +19,41 @@ namespace Basketball_API.Controllers
         public LiveScoresController(ILiveScoresRepository liveScoresRepository, ILogger<LiveScoresController> logger)
         {
             _liveScoresRepository = liveScoresRepository;
-            _logger = logger; 
+            _logger = logger;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGameScore(string gameID)
+        public async Task<IActionResult> GetGameScore(string gameID, DateTime? date = null)
         {
             try
             {
-                if(!string.IsNullOrEmpty(gameID))
+                if (!string.IsNullOrEmpty(gameID))
                 {
-                    var score = await _liveScoresRepository.GetGameScore(gameID);
+                    var score = await _liveScoresRepository.GetGameScore(gameID, date);
                     return Ok(score);
                 }
                 else
                 {
-                    return BadRequest(); 
+                    return BadRequest();
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
                 return StatusCode(500, ex.Message);
             }
         }
-    
+
         [HttpGet]
-        public async Task<IActionResult> GetGamesToday(DateTime date)
+        public async Task<IActionResult> GetGames(DateTime? date = null)
         {
             try
             {
-                if(date != null)
-                {
-                    var games = await _liveScoresRepository.GetGamesToday(date);
-                    return Ok(games); 
-                }
-                else
-                {
-                    return BadRequest(); 
-                }
+                var games = await _liveScoresRepository.GetGames(date);
+                return Ok(games);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"Error in getting stats: {ex.Message}");
                 return StatusCode(500, ex.Message);

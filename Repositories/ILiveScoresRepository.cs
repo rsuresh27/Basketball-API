@@ -6,9 +6,9 @@ namespace Basketball_API.Repositories
 {
     public interface ILiveScoresRepository
     {
-        public Task<string> GetGameScore(string gameID);
+        public Task<string> GetGameScore(string gameID, DateTime? date = null);
 
-        public Task<List<string>> GetGamesToday(DateTime date); 
+        public Task<List<string>> GetGames(DateTime? date = null); 
  
     }
 }
