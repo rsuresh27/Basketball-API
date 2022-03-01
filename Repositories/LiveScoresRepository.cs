@@ -17,12 +17,12 @@ namespace Basketball_API.Repositories
 
         public async Task<string> GetGameScore(string gameID, DateTime? date = null)
         {
-            return await GetScoreGame(gameID); 
+            return await GetScoreGame(gameID);
         }
 
         public async Task<List<string>> GetGames(DateTime? date = null)
         {
-            return await GetGamesPlayed(date); 
+            return await GetGamesPlayed(date);
         }
 
         #endregion
@@ -33,7 +33,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                var formattedDate = date.HasValue ? Regex.Replace(date.Value.ToString("yyyy/MM/dd"), "/", string.Empty) : Regex.Replace(DateTime.Now.ToString("yyyy/MM/dd"), "/", string.Empty);
+                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.Now.Date).ToString("yyyy/MM/dd"), "/", string.Empty);
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
@@ -107,11 +107,11 @@ namespace Basketball_API.Repositories
                         }
                     }
 
-                    foreach(var team in playerTeams)
+                    foreach (var team in playerTeams)
                     {
-                        if(team.ParentNode == player.ParentNode)
+                        if (team.ParentNode == player.ParentNode)
                         {
-                            final.TopPerformers[player.InnerText].Add("TEAM", team.InnerText.Split('-').ElementAtOrDefault(1).Trim()); 
+                            final.TopPerformers[player.InnerText].Add("TEAM", team.InnerText.Split('-').ElementAtOrDefault(1).Trim());
                         }
                     }
                 }
@@ -128,7 +128,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                var formattedDate = date.HasValue ? Regex.Replace(date.Value.ToString("yyyy/MM/dd"), "/", string.Empty) : Regex.Replace(DateTime.Now.ToString("yyyy/MM/dd"), "/", string.Empty);
+                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.Now.Date).ToString("yyyy/MM/dd"), "/", string.Empty);
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
