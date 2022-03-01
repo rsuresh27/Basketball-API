@@ -33,11 +33,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                DateTime timeUtc = DateTime.UtcNow;
-                TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
-                DateTime cstTime = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, cstZone);
-
-                var formattedDate = Regex.Replace(date.GetValueOrDefault(cstTime.Date).ToString("yyyy/MM/dd"), "/", string.Empty);
+                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.UtcNow.AddHours(-6).Date).ToString("yyyy/MM/dd"), "/", string.Empty);
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
@@ -132,11 +128,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                DateTime timeUtc = DateTime.UtcNow;
-                TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
-                DateTime cstTime = TimeZoneInfo.ConvertTimeFromUtc(timeUtc, cstZone);
-
-                var formattedDate = Regex.Replace(date.GetValueOrDefault(cstTime.Date).ToString("yyyy/MM/dd"), "/", string.Empty);
+                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.UtcNow.AddHours(-6).Date).ToString("yyyy/MM/dd"), "/", string.Empty);
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
