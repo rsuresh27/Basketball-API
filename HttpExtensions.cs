@@ -24,7 +24,7 @@ namespace Utiliy
                         }
                         else
                         {
-                            throw new Exception("An error occurred getting the stats, please check you typed the input parameters correctly or try again later");
+                            throw new Exception("An error occurred getting the data, please check you typed the input parameters correctly or try again later");
                         }
                     }
                 }
