@@ -18,13 +18,13 @@ namespace Basketball_API.Controllers
             _statLeadersRepository = statLeadersRepository;
             _logger = logger;
         }
-
+        
         [HttpGet]
-        public async Task<IActionResult> GetTop5PlayersPointsPerGame(string year = "2022")
+        public async Task<IActionResult> GetTop5PlayersPointsPerGame(string year = null)
         {
             try
             {
-                var statValue = await _statLeadersRepository.GetTop5PlayersPPG(year);
+                var statValue = await _statLeadersRepository.GetTop5PlayersPPG(year ?? DateTime.UtcNow.Year.ToString());
                 return Ok(statValue);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTop5PlayersReboundsPerGame(string year = "2022")
+        public async Task<IActionResult> GetTop5PlayersReboundsPerGame(string year = null)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTop5PlayersAssistsPerGame(string year = "2022")
+        public async Task<IActionResult> GetTop5PlayersAssistsPerGame(string year = null)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTop5PlayersStealsPerGame(string year = "2022")
+        public async Task<IActionResult> GetTop5PlayersStealsPerGame(string year = null)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTop5PlayersBlocksPerGame(string year = "2022")
+        public async Task<IActionResult> GetTop5PlayersBlocksPerGame(string year = null)
         {
             try
             {
@@ -93,5 +93,6 @@ namespace Basketball_API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+    
     }
 }

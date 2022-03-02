@@ -59,5 +59,44 @@ namespace Basketball_API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+    
+        [HttpGet] 
+        public async Task<IActionResult> GameNCAAGameScore(string gameID, DateTime? date = null)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(gameID))
+                {
+                    var score = await _liveScoresRepository.GetNCAAGameScore(gameID, date);
+                    return Ok(score);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+    
+        [HttpGet]
+        public async Task<IActionResult> GetNCAAGames(DateTime? date)
+        {
+            try
+            {
+                var games = await _liveScoresRepository.GetNCAAGames(date);
+                return Ok(games);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+        
     }
 }

@@ -45,7 +45,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                year = year.Trim();
+                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim(); 
 
                 var url = $"https://www.basketball-reference.com/leagues/NBA_{year}_leaders.html";
 
@@ -67,6 +67,12 @@ namespace Basketball_API.Repositories
 
                 Dictionary<string, string> top5PlayersPPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
 
+                //only get the week if it is the current nba season
+                if((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
+                {
+                    top5PlayersPPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                }         
+
                 return top5PlayersPPG;
             }
             catch (Exception ex)
@@ -79,7 +85,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                year = year.Trim();
+                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim();
 
                 var url = $"https://www.basketball-reference.com/leagues/NBA_{year}_leaders.html";
 
@@ -101,6 +107,13 @@ namespace Basketball_API.Repositories
 
                 Dictionary<string, string> top5PlayersRPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
 
+                //only get the week if it is the current nba season
+                if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
+                {
+                    top5PlayersRPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                }
+
+
                 return top5PlayersRPG;
             }
             catch (Exception ex)
@@ -113,7 +126,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                year = year.Trim();
+                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim();
 
                 var url = $"https://www.basketball-reference.com/leagues/NBA_{year}_leaders.html";
 
@@ -135,6 +148,13 @@ namespace Basketball_API.Repositories
                           
                 Dictionary<string, string> top5PlayersAPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
 
+                //only get the week if it is the current nba season
+                if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
+                {
+                    top5PlayersAPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                }
+
+
                 return top5PlayersAPG;
             }
             catch (Exception ex)
@@ -147,7 +167,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                year = year.Trim();
+                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim();
 
                 var url = $"https://www.basketball-reference.com/leagues/NBA_{year}_leaders.html";
 
@@ -169,6 +189,13 @@ namespace Basketball_API.Repositories
 
                 Dictionary<string, string> top5PlayersSPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
 
+                //only get the week if it is the current nba season
+                if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
+                {
+                    top5PlayersSPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                }
+
+
                 return top5PlayersSPG;
             }
             catch (Exception ex)
@@ -181,7 +208,7 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                year = year.Trim();
+                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim();
 
                 var url = $"https://www.basketball-reference.com/leagues/NBA_{year}_leaders.html";
 
@@ -202,6 +229,13 @@ namespace Basketball_API.Repositories
                 var stats = top5BPGstats.Select(playerStat => playerStat.Where(node => node.HasClass("who") || node.HasClass("value")).ToList());
 
                 Dictionary<string, string> top5PlayersBPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
+
+                //only get the week if it is the current nba season
+                if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
+                {
+                    top5PlayersBPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                }
+
 
                 return top5PlayersBPG;
             }
