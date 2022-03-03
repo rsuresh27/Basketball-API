@@ -46,5 +46,49 @@ namespace Utiliy
 
             return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date.AddDays(5) - startDateConverted).TotalDays / 7));
         }
+
+        public async static Task<ValidatedScore> ValidateScore(string gameID, string today)
+        {
+            var scoreboardURL = $"https://www.espn.com/nba/scoreboard/_/date/{today}";
+
+            var gamecastURL = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
+
+            HtmlDocument scoreboard = new HtmlDocument();
+            HtmlDocument gamecast = new HtmlDocument();
+
+            scoreboard.LoadHtml(await HttpExtensions.LoadWebPageAsString(scoreboardURL));
+
+            gamecast.LoadHtml(await HttpExtensions.LoadWebPageAsString(gamecastURL));
+
+            var scoreboardPage = HtmlExtensions.GetChildNodes(scoreboard.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
+
+            var scoreboardGames = scoreboardPage.Descendants("section").FirstOrDefault(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between" && node.Id == gameID);
+
+            var scoreboardScoreContainer = scoreboardPage.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "Scoreboard__RowContainer flex flex-column flex-auto" && node.ParentNode.Id == gameID).FirstOrDefault();
+
+            var scoreboardScores = scoreboardScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Score h4")).Select(node => node.InnerText).OrderBy(score => score);
+
+            var gamecastPage = gamecast.GetElementbyId("global-viewport");
+
+            var gamecastScoreContainer = gamecastPage.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("competitors"));
+
+            var gamecastScores = gamecastScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("score icon-font")).Select(node => node.InnerText).OrderBy(score => score);
+
+            if (scoreboardScores.SequenceEqual(gamecastScores))
+            {
+                return ValidatedScore.Validated;
+            }
+
+            else if (!scoreboardScores.Any() || !gamecastScores.Any())
+            {
+                return ValidatedScore.GameNotStarted;
+            }
+
+            else
+            {
+                return ValidatedScore.NotValidated;
+            }
+        }
+
     }
 }

@@ -27,12 +27,12 @@ namespace Basketball_API.Repositories
 
         public async Task<string> GetNCAAGameScore(string gameID, DateTime? date = null)
         {
-            return await GetScoreGameNCAA(gameID, date); 
+            return await GetScoreGameNCAA(gameID, date);
         }
 
         public async Task<List<string>> GetNCAAGames(DateTime? date = null)
         {
-            return await GetGamesPlayedNCAA(date); 
+            return await GetGamesPlayedNCAA(date);
         }
 
         #endregion
@@ -48,6 +48,13 @@ namespace Basketball_API.Repositories
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
                 HtmlDocument htmlDocument = new HtmlDocument();
+
+                var validated = ValidatedScore.NotValidated;
+
+                while (validated != ValidatedScore.NotValidated)
+                {
+                    validated = await LiveScoresExtensions.ValidateScore(gameID, formattedDate);
+                }
 
                 htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
 
@@ -75,11 +82,9 @@ namespace Basketball_API.Repositories
                     {
                         var names = teamScores.Select(node => node.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "") == "ScoreCell__TeamName ScoreCell__TeamName--shortDisplayName truncate db")).ToList();
                         return ($"Game has not started between the {names.ElementAtOrDefault(0).InnerText} and {names.ElementAtOrDefault(1).InnerText}");
-
                     }
                     else
                     {
-
                         scores.Add(team.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "ScoreCell__TeamName ScoreCell__TeamName--shortDisplayName truncate db").FirstOrDefault().InnerText,
                         team.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Score h4")).FirstOrDefault().InnerText);
                     }
@@ -167,6 +172,13 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
+                var validated = ValidatedScore.NotValidated;
+
+                while (validated != ValidatedScore.NotValidated)
+                {
+                    validated = await LiveScoresExtensions.ValidateScore(gameID, formattedDate);
+                }
+
                 htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
 
                 var page = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
@@ -245,7 +257,7 @@ namespace Basketball_API.Repositories
                     }
                 }
 
-                return JsonSerializer.Serialize(final); 
+                return JsonSerializer.Serialize(final);
 
             }
             catch (Exception ex)
