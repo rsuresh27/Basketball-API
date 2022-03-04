@@ -61,7 +61,7 @@ namespace Basketball_API.Controllers
         }
     
         [HttpGet] 
-        public async Task<IActionResult> GameNCAAGameScore(string gameID, DateTime? date = null)
+        public async Task<IActionResult> GetNCAAGameScore(string gameID, DateTime? date = null)
         {
             try
             {

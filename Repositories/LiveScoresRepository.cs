@@ -228,7 +228,7 @@ namespace Basketball_API.Repositories
 
                 var gameDescription = gameScoreContainer.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "") == "ScoreboardScoreCell__Note clr-gray-05 n9 w-auto")?.InnerText;
 
-                final.Time = (await LiveScoresExtensions.GameTime(gameID)) + (!string.IsNullOrEmpty(gameDescription) ? ", " + gameDescription : "");
+                final.Time = (await LiveScoresExtensions.GameTimeNCAA(gameID)) + (!string.IsNullOrEmpty(gameDescription) ? ", " + gameDescription : "");
 
                 final.Scores = scores;
 

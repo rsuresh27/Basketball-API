@@ -90,5 +90,21 @@ namespace Utiliy
             }
         }
 
+        public async static Task<string> GameTimeNCAA(string gameID)
+        {
+            var url = $"https://www.espn.com/mens-college-basketball/game/_/gameId/{gameID}";
+
+            HtmlDocument htmlDocument = new HtmlDocument();
+
+            htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+
+            var page = htmlDocument.GetElementbyId("global-viewport").ChildNodes;
+
+            var content = page.FirstOrDefault(node => node.Id == "pane-main");
+
+            var time = content.Descendants().FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("status-detail"));
+
+            return time.InnerText;
+        }
     }
 }
