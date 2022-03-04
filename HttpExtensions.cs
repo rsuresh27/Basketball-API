@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System;
 
@@ -14,6 +15,18 @@ namespace Utiliy
                 {
                     using (HttpResponseMessage httpResponse = client.GetAsync(url).Result)
                     {
+                        //ensure repsonse is not cached so we get most recent page regardless
+                        httpResponse.Headers.CacheControl = new CacheControlHeaderValue
+                        {
+                            NoCache = true,
+                            NoStore = true,
+                            MustRevalidate = true
+                        };
+
+                        httpResponse.Headers.Pragma.ParseAdd("no-cache");
+
+                        httpResponse.Content?.Headers.TryAddWithoutValidation("Expires", "0");
+
                         if (httpResponse.IsSuccessStatusCode)
                         {
                             using (HttpContent httpContent = httpResponse.Content)

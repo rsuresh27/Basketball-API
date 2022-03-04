@@ -13,11 +13,11 @@ namespace Basketball_API.Repositories
 {
     public class LiveScoresRepository : ILiveScoresRepository
     {
-        #region Endpoint
+        #region Endpoints
 
         public async Task<string> GetGameScore(string gameID, DateTime? date = null)
         {
-            return await GetScoreGame(gameID);
+            return await GetScoreGame(gameID, date);
         }
 
         public async Task<List<string>> GetGames(DateTime? date = null)
@@ -43,7 +43,9 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.UtcNow.AddHours(-6).Date).ToString("yyyy/MM/dd"), "/", string.Empty);
+                var convertedDate = date.HasValue ? date.Value.ToString("yyyy/MM/dd") : DateTime.UtcNow.AddHours(-6).Date.ToString("yyyy/MM/dd");
+
+                var formattedDate = Regex.Replace(convertedDate, "/", string.Empty);
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
@@ -166,7 +168,9 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.UtcNow.AddHours(-6).Date).ToString("yyyy/MM/dd"), "/", string.Empty);
+                var convertedDate = date.HasValue ? date.Value.ToString("yyyy/MM/dd") : DateTime.UtcNow.AddHours(-6).Date.ToString("yyyy/MM/dd");
+
+                var formattedDate = Regex.Replace(convertedDate, "/", string.Empty);
 
                 var url = $"https://www.espn.com/mens-college-basketball/scoreboard/_/date/{formattedDate}";
 
@@ -270,7 +274,9 @@ namespace Basketball_API.Repositories
         {
             try
             {
-                var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.UtcNow.AddHours(-6).Date).ToString("yyyy/MM/dd"), "/", string.Empty);
+                var convertedDate = date.HasValue ? date.Value.ToString("yyyy/MM/dd") : DateTime.UtcNow.AddHours(-6).Date.ToString("yyyy/MM/dd");
+
+                var formattedDate = Regex.Replace(convertedDate, "/", string.Empty);
 
                 var url = $"https://www.espn.com/mens-college-basketball/scoreboard/_/date/{formattedDate}";
 
