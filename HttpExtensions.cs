@@ -1,6 +1,7 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers; 
 using System.Threading.Tasks;
-using System;
 
 namespace Utiliy
 {
@@ -11,9 +12,19 @@ namespace Utiliy
             try
             {
                 using (HttpClient client = new HttpClient())
-                {
+                {                    
                     using (HttpResponseMessage httpResponse = client.GetAsync(url).Result)
                     {
+                        httpResponse.Headers.CacheControl = new CacheControlHeaderValue
+                        {
+                            NoCache = true,
+                            NoStore = true,
+                            MustRevalidate = true
+                        };
+
+                        httpResponse.Headers.Pragma.ParseAdd("no-cache");
+                        httpResponse.Content?.Headers.TryAddWithoutValidation("Expires", "0"); 
+
                         if (httpResponse.IsSuccessStatusCode)
                         {
                             using (HttpContent httpContent = httpResponse.Content)
