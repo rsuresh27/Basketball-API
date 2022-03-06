@@ -1,4 +1,4 @@
-﻿namespace Utiliy
+﻿namespace Basketball_API
 {
     public enum ValidatedScore
     {

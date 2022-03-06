@@ -16,10 +16,11 @@ namespace Basketball_API.Controllers
         private readonly ILiveScoresRepository _liveScoresRepository;
         private readonly ILogger<LiveScoresController> _logger;
 
+
         public LiveScoresController(ILiveScoresRepository liveScoresRepository, ILogger<LiveScoresController> logger)
         {
             _liveScoresRepository = liveScoresRepository;
-            _logger = logger;
+            _logger = logger;  
         }
 
         [HttpGet]

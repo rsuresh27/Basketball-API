@@ -6,12 +6,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Utiliy; 
 
 namespace Basketball_API.Repositories
 {
-    public class StatRepository : IStatsRepository
+    public class StatRepository : BaseFunctions, IStatsRepository
     {
+        public StatRepository(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
+
         #region Endpoints
 
         public async Task<double> GetStat(string player, string stat, string year = null)
@@ -38,7 +39,7 @@ namespace Basketball_API.Repositories
 
         #region Stat Functions
 
-        private static async Task<Stats> LoadPlayerStats(string player)
+        private async Task<Stats> LoadPlayerStats(string player)
         {
             try
             {
@@ -69,14 +70,14 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
                 //get div that contains the info we need
                 var content = htmlDocument.GetElementbyId("content")?.ChildNodes;
 
 
                 //navigate down divs to get the div that contains the table 
-                var tableContainer = HtmlExtensions.GetChildNodes(content, "all_per_game-playoffs_per_game");
+                var tableContainer = GetChildNodes(content, "all_per_game-playoffs_per_game");
 
 
                 //if a player hasnt been to the playoffs, we need to go down a different path within the html because the eleme
@@ -89,14 +90,14 @@ namespace Basketball_API.Repositories
 
                 if (playoffs)
                 {
-                    statsTableDiv = HtmlExtensions.GetChildNodes(tableContainer, "switcher_per_game-playoffs_per_game");
+                    statsTableDiv = GetChildNodes(tableContainer, "switcher_per_game-playoffs_per_game");
                 }
                 else
                 {
                     statsTableDiv = tableContainer;
                 }
 
-                var regularSeasonStatsTableDiv = HtmlExtensions.GetChildNodes(statsTableDiv, "div_per_game");
+                var regularSeasonStatsTableDiv = GetChildNodes(statsTableDiv, "div_per_game");
 
                 //once table is reached, get each trow from the tbody to get the data needed
                 var trowsTbody = regularSeasonStatsTableDiv.Descendants("tr").Where(node => node.ParentNode.XPath.Contains("tbody"));
@@ -153,7 +154,7 @@ namespace Basketball_API.Repositories
             }
         }
 
-        private static async Task<double> GetSingleStat(string player, string statToSearch, string year)
+        private async Task<double> GetSingleStat(string player, string statToSearch, string year)
         {
             try
             {
@@ -249,7 +250,7 @@ namespace Basketball_API.Repositories
                 HtmlDocument htmlDocument = new HtmlDocument();
 
                 //load webpage and get html within the webpage to parse for stats
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
                 var content = htmlDocument.GetElementbyId("content").ChildNodes.Where(node => node.GetAttributeValue("class", "") == "flexindex").FirstOrDefault();
 
@@ -266,15 +267,15 @@ namespace Basketball_API.Repositories
                 Console.WriteLine(teamCurrentSeasonStatsUrl);
 
                 //team stats 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(teamCurrentSeasonStatsUrl));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(teamCurrentSeasonStatsUrl));
 
                 var teamContent = htmlDocument.GetElementbyId("content").ChildNodes;
 
-                var allStats = HtmlExtensions.GetChildNodes(teamContent, "all_stats");
+                var allStats = GetChildNodes(teamContent, "all_stats");
 
-                var statsDiv = HtmlExtensions.GetChildNodes(allStats, "div_stats");
+                var statsDiv = GetChildNodes(allStats, "div_stats");
 
-                var statsTable = HtmlExtensions.GetChildNodes(statsDiv, "stats");
+                var statsTable = GetChildNodes(statsDiv, "stats");
 
                 var statsTableThead = statsTable.Descendants();
 
@@ -309,18 +310,18 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var allPlayersTableDiv = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_players");
+                var allPlayersTableDiv = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_players");
 
                 if (allPlayersTableDiv == null)
                 {
                     throw new Exception($"No games played within the past {daysAgo} days");
                 }
 
-                var tableDiv = HtmlExtensions.GetChildNodes(allPlayersTableDiv, "div_players");
+                var tableDiv = GetChildNodes(allPlayersTableDiv, "div_players");
 
-                var table = HtmlExtensions.GetChildNodes(tableDiv, "players");
+                var table = GetChildNodes(tableDiv, "players");
 
                 var thead = table.Descendants("th").Where(node => node.ParentNode.XPath.Contains("thead"));
 

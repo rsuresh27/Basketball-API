@@ -1,19 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Utiliy;
-using HtmlAgilityPack;
-using System.Dynamic;
-using System.Text.Json;
-using System.Linq;
+﻿using HtmlAgilityPack;
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 
 namespace Basketball_API.Repositories
 {
-    public class LiveScoresRepository : ILiveScoresRepository
+    public class LiveScoresRepository : BaseFunctions, ILiveScoresRepository
     {
-        #region Endpoint
+
+        public LiveScoresRepository(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
+
+        #region Endpoints
 
         public async Task<string> GetGameScore(string gameID, DateTime? date = null)
         {
@@ -53,12 +56,12 @@ namespace Basketball_API.Repositories
 
                 while (validated != ValidatedScore.NotValidated)
                 {
-                    validated = await LiveScoresExtensions.ValidateScore(gameID, formattedDate);
+                    validated = await ValidateScore(gameID, formattedDate);
                 }
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var page = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
+                var page = GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
 
                 var games = page.Descendants("section").Where(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between");
 
@@ -102,7 +105,7 @@ namespace Basketball_API.Repositories
                 //use expandoobject to create json 
                 dynamic final = new ExpandoObject();
 
-                final.Time = await LiveScoresExtensions.GameTime(gameID);
+                final.Time = await GameTime(gameID);
 
                 final.Scores = scores;
 
@@ -149,9 +152,9 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var page = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
+                var page = GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
 
                 return page.Descendants("section").Where(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between").Select(node => node.Id).ToList();
             }
@@ -176,12 +179,12 @@ namespace Basketball_API.Repositories
 
                 while (validated != ValidatedScore.NotValidated)
                 {
-                    validated = await LiveScoresExtensions.ValidateScore(gameID, formattedDate);
+                    validated = await ValidateScore(gameID, formattedDate);
                 }
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var page = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
+                var page = GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
 
                 var games = page.Descendants("section").Where(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between");
 
@@ -210,7 +213,7 @@ namespace Basketball_API.Repositories
                         var teamRank = team.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "ScoreCell__Rank ttn ScoreCell__Rank--scoreboard").FirstOrDefault()?.InnerText;
                         var teamName = team.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "ScoreCell__TeamName ScoreCell__TeamName--shortDisplayName truncate db").FirstOrDefault().InnerText;
 
-                        scores.Add(string.IsNullOrEmpty(teamRank) ? teamName : string.Format("{0} - {1}", teamRank, teamName),
+                        scores.Add(string.IsNullOrEmpty(teamRank) ? teamName : string.Format("{0}-{1}", teamRank, teamName),
                         team.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Score h4")).FirstOrDefault().InnerText);
                     }
                 }
@@ -228,7 +231,7 @@ namespace Basketball_API.Repositories
 
                 var gameDescription = gameScoreContainer.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "") == "ScoreboardScoreCell__Note clr-gray-05 n9 w-auto")?.InnerText;
 
-                final.Time = (await LiveScoresExtensions.GameTimeNCAA(gameID)) + (!string.IsNullOrEmpty(gameDescription) ? ", " + gameDescription : "");
+                final.Time = (await GameTimeNCAA(gameID)) + (!string.IsNullOrEmpty(gameDescription) ? ", " + gameDescription : "");
 
                 final.Scores = scores;
 
@@ -276,9 +279,9 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var page = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
+                var page = GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
 
                 return page.Descendants("section").Where(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between").Select(node => node.Id).ToList();
             }

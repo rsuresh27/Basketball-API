@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Utiliy;  
 
 namespace Basketball_API.Repositories
 {
-    public class StatLeadersRepository : IStatLeadersRepository
+    public class StatLeadersRepository : BaseFunctions, IStatLeadersRepository
     {
+
+        public StatLeadersRepository(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
+
         #region Endpoints
 
         public async Task<Dictionary<string, string>> GetTop5PlayersPPG(string year)
@@ -51,13 +53,13 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var allStatsLeaders = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
+                var allStatsLeaders = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
 
-                var statsLeadersDiv = HtmlExtensions.GetChildNodes(allStatsLeaders, "div_leaders");
+                var statsLeadersDiv = GetChildNodes(allStatsLeaders, "div_leaders");
 
-                var ppgLeadersDiv = HtmlExtensions.GetChildNodes(statsLeadersDiv, "leaders_pts_per_g");
+                var ppgLeadersDiv = GetChildNodes(statsLeadersDiv, "leaders_pts_per_g");
 
                 var top5PPGtr = ppgLeadersDiv.Descendants("tr").Take(5);
 
@@ -70,7 +72,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    top5PlayersPPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                    top5PlayersPPG.Add("Week", await GetWeekNBA());
                 }         
 
                 return top5PlayersPPG;
@@ -91,13 +93,13 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var allStatsLeaders = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
+                var allStatsLeaders = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
 
-                var statsLeadersDiv = HtmlExtensions.GetChildNodes(allStatsLeaders, "div_leaders");
+                var statsLeadersDiv = GetChildNodes(allStatsLeaders, "div_leaders");
 
-                var rpgLeadersDiv = HtmlExtensions.GetChildNodes(statsLeadersDiv, "leaders_trb_per_g");
+                var rpgLeadersDiv = GetChildNodes(statsLeadersDiv, "leaders_trb_per_g");
 
                 var top5RPGtr = rpgLeadersDiv.Descendants("tr").Take(5);
 
@@ -110,7 +112,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    top5PlayersRPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                    top5PlayersRPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -132,13 +134,13 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var allStatsLeaders = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
+                var allStatsLeaders = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
 
-                var statsLeadersDiv = HtmlExtensions.GetChildNodes(allStatsLeaders, "div_leaders");
+                var statsLeadersDiv = GetChildNodes(allStatsLeaders, "div_leaders");
 
-                var apgLeadersDiv = HtmlExtensions.GetChildNodes(statsLeadersDiv, "leaders_ast_per_g");
+                var apgLeadersDiv = GetChildNodes(statsLeadersDiv, "leaders_ast_per_g");
 
                 var top5APGtr = apgLeadersDiv.Descendants("tr").Take(5);
 
@@ -151,7 +153,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    top5PlayersAPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                    top5PlayersAPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -173,13 +175,13 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var allStatsLeaders = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
+                var allStatsLeaders = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
 
-                var statsLeadersDiv = HtmlExtensions.GetChildNodes(allStatsLeaders, "div_leaders");
+                var statsLeadersDiv = GetChildNodes(allStatsLeaders, "div_leaders");
 
-                var spgLeadersDiv = HtmlExtensions.GetChildNodes(statsLeadersDiv, "leaders_stl_per_g");
+                var spgLeadersDiv = GetChildNodes(statsLeadersDiv, "leaders_stl_per_g");
 
                 var top5SPGtr = spgLeadersDiv.Descendants("tr").Take(5);
 
@@ -192,7 +194,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    top5PlayersSPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                    top5PlayersSPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -214,13 +216,13 @@ namespace Basketball_API.Repositories
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
-                htmlDocument.LoadHtml(await HttpExtensions.LoadWebPageAsString(url));
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-                var allStatsLeaders = HtmlExtensions.GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
+                var allStatsLeaders = GetChildNodes(htmlDocument.GetElementbyId("content").ChildNodes, "all_leaders");
 
-                var statsLeadersDiv = HtmlExtensions.GetChildNodes(allStatsLeaders, "div_leaders");
+                var statsLeadersDiv = GetChildNodes(allStatsLeaders, "div_leaders");
 
-                var spgLeadersDiv = HtmlExtensions.GetChildNodes(statsLeadersDiv, "leaders_blk_per_g");
+                var spgLeadersDiv = GetChildNodes(statsLeadersDiv, "leaders_blk_per_g");
 
                 var top5BPGtr = spgLeadersDiv.Descendants("tr").Take(5);
 
@@ -233,7 +235,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    top5PlayersBPG.Add("Week", await LiveScoresExtensions.GetWeekNBA());
+                    top5PlayersBPG.Add("Week", await GetWeekNBA());
                 }
 
 
