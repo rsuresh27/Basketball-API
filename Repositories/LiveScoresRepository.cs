@@ -7,20 +7,20 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Basketball_API.Base_Classes;
 
 
 namespace Basketball_API.Repositories
 {
-    public class LiveScoresRepository : BaseFunctions, ILiveScoresRepository
+    public class LiveScoresRepository : LiveScoreBase, ILiveScoresRepository
     {
-
         public LiveScoresRepository(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
         #region Endpoints
 
         public async Task<string> GetGameScore(string gameID, DateTime? date = null)
         {
-            return await GetScoreGame(gameID);
+            return await GetScoreGame(gameID, date);
         }
 
         public async Task<List<string>> GetGames(DateTime? date = null)

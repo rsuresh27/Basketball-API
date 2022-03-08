@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Basketball_API.Base_Classes;
 
 namespace Basketball_API.Repositories
 {
@@ -261,6 +262,8 @@ namespace Basketball_API.Repositories
                 var nbaTeams = teamSelectForm.Where(node => node.Id == "select_team").FirstOrDefault().ChildNodes;
 
                 var teamUrl = nbaTeams.ToList().Where(teamName => teamName.InnerText.ToLower().Contains(team)).Select(selectedTeam => selectedTeam.GetAttributeValue("value", "")).FirstOrDefault();
+
+                teamUrl = Regex.Replace(teamUrl, "BRK", "NJN"); 
 
                 var teamCurrentSeasonStatsUrl = $"{url}{teamUrl}/stats_per_game_totals.html";
 

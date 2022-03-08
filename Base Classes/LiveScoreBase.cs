@@ -1,0 +1,112 @@
+﻿using HtmlAgilityPack;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+
+namespace Basketball_API.Base_Classes
+{
+    public abstract class LiveScoreBase : BaseFunctions, ILiveScoreBase
+    {
+        protected LiveScoreBase(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
+
+        #region Live Scores
+
+        public async Task<string> GameTime(string gameID)
+        {
+            var url = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
+
+            HtmlDocument htmlDocument = new HtmlDocument();
+
+            htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+
+            var page = htmlDocument.GetElementbyId("global-viewport").ChildNodes;
+
+            var content = page.FirstOrDefault(node => node.Id == "pane-main");
+
+            var time = content.Descendants().FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("status-detail"));
+
+            return time.InnerText;
+        }       
+
+        public async Task<ValidatedScore> ValidateScore(string gameID, string today)
+        {
+            var scoreboardURL = $"https://www.espn.com/nba/scoreboard/_/date/{today}";
+
+            var gamecastURL = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
+
+            HtmlDocument scoreboard = new HtmlDocument();
+            HtmlDocument gamecast = new HtmlDocument();
+
+            scoreboard.LoadHtml(await LoadWebPageAsString(scoreboardURL));
+
+            gamecast.LoadHtml(await LoadWebPageAsString(gamecastURL));
+
+            var scoreboardPage = GetChildNodes(scoreboard.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
+
+            var scoreboardGames = scoreboardPage.Descendants("section").FirstOrDefault(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between" && node.Id == gameID);
+
+            var scoreboardScoreContainer = scoreboardPage.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "Scoreboard__RowContainer flex flex-column flex-auto" && node.ParentNode.Id == gameID).FirstOrDefault();
+
+            var scoreboardScores = scoreboardScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Score h4")).Select(node => node.InnerText).OrderBy(score => score);
+
+            var scoreboardWinner = scoreboardScoreContainer.Descendants("svg").FirstOrDefault(node => node.GetAttributeValue("class", "") == "ScoreboardScoreCell__WinnerIcon absolute icon__svg");
+
+            var gamecastPage = gamecast.GetElementbyId("global-viewport");
+
+            var gamecastScoreContainer = gamecastPage.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("competitors"));
+
+            var gamecastScores = gamecastScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("score icon-font")).Select(node => node.InnerText).OrderBy(score => score);
+
+            var gamecastWinner = gamecastScoreContainer.ParentNode.GetAttributeValue("class", "");
+
+            if (scoreboardScores.SequenceEqual(gamecastScores))
+            {
+                if (scoreboardWinner != null || gamecastWinner.Contains("winner"))
+                {
+                    if (scoreboardWinner != null && gamecastWinner.Contains("winner"))
+                    {
+                        return ValidatedScore.Validated;
+                    }
+
+                    else
+                    {
+                        return ValidatedScore.NotValidated;
+                    }
+                }
+
+                return ValidatedScore.Validated;
+            }
+
+            else if (!scoreboardScores.Any() || !gamecastScores.Any())
+            {
+                return ValidatedScore.GameNotStarted;
+            }
+
+            else
+            {
+                return ValidatedScore.NotValidated;
+            }
+        }
+
+        public async Task<string> GameTimeNCAA(string gameID)
+        {
+            var url = $"https://www.espn.com/mens-college-basketball/game/_/gameId/{gameID}";
+
+            HtmlDocument htmlDocument = new HtmlDocument();
+
+            htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+
+            var page = htmlDocument.GetElementbyId("global-viewport").ChildNodes;
+
+            var content = page.FirstOrDefault(node => node.Id == "pane-main");
+
+            var time = content.Descendants().FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("status-detail"));
+
+            return time.InnerText;
+        }
+
+        #endregion
+    }
+}
