@@ -50,16 +50,18 @@ namespace Basketball_API.Repositories
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
-                HtmlDocument htmlDocument = new HtmlDocument();
+                HtmlDocument htmlDocument = new HtmlDocument(); 
 
                 var validated = ValidatedScore.NotValidated;
 
-                while (validated != ValidatedScore.NotValidated)
+                while (validated == ValidatedScore.NotValidated)
                 {
-                    validated = await ValidateScore(gameID, formattedDate);
+                    var validatedScore = await ValidateScore(gameID, formattedDate);
+                    validated = validatedScore.Item1;
+                    htmlDocument = validatedScore.Item2; 
                 }
 
-                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+                //htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
                 var page = GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
 
@@ -177,12 +179,14 @@ namespace Basketball_API.Repositories
 
                 var validated = ValidatedScore.NotValidated;
 
-                while (validated != ValidatedScore.NotValidated)
+                while (validated == ValidatedScore.NotValidated)
                 {
-                    validated = await ValidateScore(gameID, formattedDate);
+                    var validatedScore = await ValidateScoreNCAA(gameID, formattedDate);
+                    validated = validatedScore.Item1;
+                    htmlDocument = validatedScore.Item2;
                 }
 
-                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+                //htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
                 var page = GetChildNodes(htmlDocument.GetElementbyId("espnfitt").ChildNodes, "DataWrapper");
 
