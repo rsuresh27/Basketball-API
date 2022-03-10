@@ -109,7 +109,7 @@ namespace Basketball_API.Base_Classes
 
         public async Task<Tuple<ValidatedScore, HtmlDocument>> ValidateScoreNCAA(string gameID, string today)
         {
-            var scoreboardURL = $"https://www.espn.com/mens-college-basketball/scoreboard/_/date/{today}";
+            var scoreboardURL = $"https://www.espn.com/mens-college-basketball/scoreboard/_/date/{today}/group/50";
 
             var gamecastURL = $"https://www.espn.com/mens-college-basketball/game/_/gameId/{gameID}";
 
