@@ -275,7 +275,7 @@ namespace Basketball_API.Repositories
             {
                 var formattedDate = Regex.Replace(date.GetValueOrDefault(DateTime.UtcNow.AddHours(-6).Date).ToString("yyyy/MM/dd"), "/", string.Empty);
 
-                var url = $"https://www.espn.com/mens-college-basketball/scoreboard/_/date/{formattedDate}";
+                var url = $"https://www.espn.com/mens-college-basketball/scoreboard/_/date/{formattedDate}/group/50";
 
                 HtmlDocument htmlDocument = new HtmlDocument();
 
