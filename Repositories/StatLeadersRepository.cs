@@ -73,7 +73,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    //top5PlayersPPG.Add("Week", await GetWeekNBA());
+                    top5PlayersPPG.Add("Week", await GetWeekNBA());
                 }         
 
                 return top5PlayersPPG;
@@ -113,7 +113,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    //top5PlayersRPG.Add("Week", await GetWeekNBA());
+                   top5PlayersRPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -154,7 +154,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    //top5PlayersAPG.Add("Week", await GetWeekNBA());
+                    top5PlayersAPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -195,7 +195,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    //top5PlayersSPG.Add("Week", await GetWeekNBA());
+                    top5PlayersSPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -236,7 +236,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                    //top5PlayersBPG.Add("Week", await GetWeekNBA());
+                    top5PlayersBPG.Add("Week", await GetWeekNBA());
                 }
 
 
