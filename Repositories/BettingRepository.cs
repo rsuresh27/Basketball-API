@@ -1,14 +1,12 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using Basketball_API.Base_Classes;
+using HtmlAgilityPack;
 using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
-using System.Data;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Basketball_API.Base_Classes;
 
 namespace Basketball_API.Repositories
 {
@@ -159,7 +157,7 @@ namespace Basketball_API.Repositories
 
             odds.Teams = teamOdds;
 
-            return JsonSerializer.Serialize(odds); ;
+            return JsonSerializer.Serialize(odds);
         }
 
         #endregion

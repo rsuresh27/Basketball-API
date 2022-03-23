@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Basketball_API.Base_Classes
@@ -28,7 +27,7 @@ namespace Basketball_API.Base_Classes
             var time = content.Descendants().FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("status-detail"));
 
             return time.InnerText;
-        }       
+        }
 
         public async Task<Tuple<ValidatedScore, HtmlDocument>> ValidateScore(string gameID, string today)
         {

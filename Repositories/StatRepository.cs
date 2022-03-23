@@ -1,4 +1,5 @@
-﻿using Basketball_API.Models;
+﻿using Basketball_API.Base_Classes;
+using Basketball_API.Models;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Basketball_API.Base_Classes;
 
 namespace Basketball_API.Repositories
 {
@@ -35,7 +35,7 @@ namespace Basketball_API.Repositories
         {
             return await GetDayTop5Players(daysAgo);
         }
-        
+
         #endregion
 
         #region Stat Functions
@@ -263,7 +263,7 @@ namespace Basketball_API.Repositories
 
                 var teamUrl = nbaTeams.ToList().Where(teamName => teamName.InnerText.ToLower().Contains(team)).Select(selectedTeam => selectedTeam.GetAttributeValue("value", "")).FirstOrDefault();
 
-                teamUrl = Regex.Replace(teamUrl, "BRK", "NJN"); 
+                teamUrl = Regex.Replace(teamUrl, "BRK", "NJN");
 
                 var teamCurrentSeasonStatsUrl = $"{url}{teamUrl}/stats_per_game_totals.html";
 
@@ -347,7 +347,7 @@ namespace Basketball_API.Repositories
             }
 
         }
-        
+
         #endregion
     }
 }

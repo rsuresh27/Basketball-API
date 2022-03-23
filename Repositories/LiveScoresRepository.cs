@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Basketball_API.Base_Classes;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -7,7 +8,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Basketball_API.Base_Classes;
 
 
 namespace Basketball_API.Repositories
@@ -50,7 +50,7 @@ namespace Basketball_API.Repositories
 
                 var url = $"https://www.espn.com/nba/scoreboard/_/date/{formattedDate}";
 
-                HtmlDocument htmlDocument = new HtmlDocument(); 
+                HtmlDocument htmlDocument = new HtmlDocument();
 
                 var validated = ValidatedScore.NotValidated;
 
@@ -58,7 +58,7 @@ namespace Basketball_API.Repositories
                 {
                     var validatedScore = await ValidateScore(gameID, formattedDate);
                     validated = validatedScore.Item1;
-                    htmlDocument = validatedScore.Item2; 
+                    htmlDocument = validatedScore.Item2;
                 }
 
                 //htmlDocument.LoadHtml(await LoadWebPageAsString(url));
@@ -242,7 +242,7 @@ namespace Basketball_API.Repositories
                 final.TopPerformers = new Dictionary<string, Dictionary<string, string>>();
 
                 //assign score to correct player if they exist on ESPN website 
-                if(topPerformers != null)
+                if (topPerformers != null)
                 {
                     foreach (var player in playerNames)
                     {
@@ -264,7 +264,7 @@ namespace Basketball_API.Repositories
                                 final.TopPerformers[player.InnerText].Add("TEAM", team.InnerText.Split('-').ElementAtOrDefault(1).Trim());
                             }
                         }
-                    }              
+                    }
                 }
 
                 return JsonSerializer.Serialize(final);

@@ -18,7 +18,7 @@ namespace Basketball_API.Controllers
             _statLeadersRepository = statLeadersRepository;
             _logger = logger;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetTop5PlayersPointsPerGame(string year = null)
         {
@@ -93,6 +93,6 @@ namespace Basketball_API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    
+
     }
 }

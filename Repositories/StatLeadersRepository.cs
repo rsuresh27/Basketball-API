@@ -22,12 +22,12 @@ namespace Basketball_API.Repositories
 
         public async Task<Dictionary<string, string>> GetTopPlayersRPG(string year)
         {
-            return await getTop5RBGPlayers(year); 
+            return await getTop5RBGPlayers(year);
         }
 
         public async Task<Dictionary<string, string>> GetTopPlayersAPG(string year)
         {
-            return await getTop5APGPlayers(year); 
+            return await getTop5APGPlayers(year);
         }
 
         public async Task<Dictionary<string, string>> GetTopPlayersSPG(string year)
@@ -37,18 +37,18 @@ namespace Basketball_API.Repositories
 
         public async Task<Dictionary<string, string>> GetTopPlayersBPG(string year)
         {
-            return await getTop5BPGPlayers(year); 
+            return await getTop5BPGPlayers(year);
         }
 
         #endregion
 
-        #region Stat Functions 
+        #region Stat Leaders Functions 
 
         private async Task<Dictionary<string, string>> GetTop5PPGPlayers(string year)
         {
             try
             {
-                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim(); 
+                year = (year ?? DateTime.UtcNow.Year.ToString()).Trim();
 
                 var url = $"https://www.basketball-reference.com/leagues/NBA_{year}_leaders.html";
 
@@ -71,10 +71,10 @@ namespace Basketball_API.Repositories
                 Dictionary<string, string> top5PlayersPPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
 
                 //only get the week if it is the current nba season
-                if((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
+                if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
                     top5PlayersPPG.Add("Week", await GetWeekNBA());
-                }         
+                }
 
                 return top5PlayersPPG;
             }
@@ -84,7 +84,7 @@ namespace Basketball_API.Repositories
             }
         }
 
-        private async Task<Dictionary<string,string>> getTop5RBGPlayers(string year)
+        private async Task<Dictionary<string, string>> getTop5RBGPlayers(string year)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace Basketball_API.Repositories
                 //only get the week if it is the current nba season
                 if ((DateTime.UtcNow.Month > 9 ? DateTime.Now.AddYears(1).Year.ToString() : DateTime.Now.Year.ToString()) == year)
                 {
-                   top5PlayersRPG.Add("Week", await GetWeekNBA());
+                    top5PlayersRPG.Add("Week", await GetWeekNBA());
                 }
 
 
@@ -148,7 +148,7 @@ namespace Basketball_API.Repositories
                 var top5APGstats = top5APGtr.Select(node => node.ChildNodes);
 
                 var stats = top5APGstats.Select(playerStat => playerStat.Where(node => node.HasClass("who") || node.HasClass("value")).ToList());
-                          
+
                 Dictionary<string, string> top5PlayersAPG = stats.AsEnumerable().ToDictionary(players => players.FirstOrDefault(stat => stat.HasClass("who")).InnerText.Split("&").ElementAtOrDefault(0).Trim(), players => players.FirstOrDefault(stat => stat.HasClass("value")).InnerText.Trim());
 
                 //only get the week if it is the current nba season

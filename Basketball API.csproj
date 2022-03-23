@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Basketball_API</RootNamespace>
     <UserSecretsId>52939dac-0818-4616-bddf-d6d6327b0a50</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>

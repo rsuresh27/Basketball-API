@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Basketball_API.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Basketball_API.Repositories;
 using Microsoft.Extensions.Logging;
-using System.Web;
-using System.Text.RegularExpressions; 
+using System;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Basketball_API.Controllers
 {
@@ -28,7 +25,7 @@ namespace Basketball_API.Controllers
         {
             try
             {
-                if(!string.IsNullOrEmpty(gameID))
+                if (!string.IsNullOrEmpty(gameID))
                 {
                     var odds = await _bettingRepository.GetGameOdds(gameID);
 
@@ -42,10 +39,10 @@ namespace Basketball_API.Controllers
                 }
                 else
                 {
-                    return BadRequest(); 
+                    return BadRequest();
                 }
 
-               
+
             }
             catch (Exception ex)
             {

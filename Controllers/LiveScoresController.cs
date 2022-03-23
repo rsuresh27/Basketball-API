@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Basketball_API.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Basketball_API.Repositories;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace Basketball_API.Controllers
 {
@@ -20,7 +17,7 @@ namespace Basketball_API.Controllers
         public LiveScoresController(ILiveScoresRepository liveScoresRepository, ILogger<LiveScoresController> logger)
         {
             _liveScoresRepository = liveScoresRepository;
-            _logger = logger;  
+            _logger = logger;
         }
 
         [HttpGet]
@@ -60,8 +57,8 @@ namespace Basketball_API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    
-        [HttpGet] 
+
+        [HttpGet]
         public async Task<IActionResult> GetNCAAGameScore(string gameID, DateTime? date = null)
         {
             try
@@ -83,7 +80,7 @@ namespace Basketball_API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    
+
         [HttpGet]
         public async Task<IActionResult> GetNCAAGames(DateTime? date)
         {
@@ -98,6 +95,6 @@ namespace Basketball_API.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        
+
     }
 }

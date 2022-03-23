@@ -10,7 +10,7 @@ namespace Basketball_API.Models
         public Stats(Dictionary<string, string> statNameToStatId, List<SingleYearStats> playerStats)
         {
             StatNameToStatId = statNameToStatId;
-            PlayerStats = playerStats; 
+            PlayerStats = playerStats;
         }
     }
 }

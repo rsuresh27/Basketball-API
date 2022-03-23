@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Basketball_API.Base_Classes
@@ -27,11 +26,12 @@ namespace Basketball_API.Base_Classes
 
             DateTime startDateConverted = DateTime.Parse(startDate).Date;
 
-            var daysTillNextMondayStartDate = ((int)DayOfWeek.Monday - (int)startDateConverted.DayOfWeek + 7) % 7;
+            //var daysTillNextMondayStartDate = ((int)DayOfWeek.Monday - (int)startDateConverted.DayOfWeek + 7) % 7;
 
-            var nextMondayStartDate = startDateConverted.AddDays(daysTillNextMondayStartDate);
+            //var nextMondayStartDate = startDateConverted.AddDays(daysTillNextMondayStartDate);
 
-            return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date.AddDays(5) - startDateConverted).TotalDays / 7));
+            //return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date.AddDays(5) - startDateConverted).TotalDays / 7));
+            return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date - startDateConverted).TotalDays / 7));
         }
     }
 }
