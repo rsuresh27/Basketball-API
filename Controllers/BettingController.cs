@@ -24,19 +24,59 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGameOdds(string gameId)
+        public async Task<IActionResult> GetGameOdds(string gameID)
         {
             try
             {
-                var odds = await _bettingRepository.GetGameOdds(gameId);
+                if(!string.IsNullOrEmpty(gameID))
+                {
+                    var odds = await _bettingRepository.GetGameOdds(gameID);
 
-                odds = Regex.Unescape(odds);
+                    odds = Regex.Unescape(odds);
 
-                odds = Regex.Replace(odds, "\n", "");
-                odds = Regex.Replace(odds, "\r", "");
-                odds = Regex.Replace(odds, "\t", "");
+                    odds = Regex.Replace(odds, "\n", "");
+                    odds = Regex.Replace(odds, "\r", "");
+                    odds = Regex.Replace(odds, "\t", "");
 
-                return Ok(odds); 
+                    return Ok(odds);
+                }
+                else
+                {
+                    return BadRequest(); 
+                }
+
+               
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting odds: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetNCAAGameOdds(string gameID)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(gameID))
+                {
+                    var odds = await _bettingRepository.GetNCAAGameOdds(gameID);
+
+                    odds = Regex.Unescape(odds);
+
+                    odds = Regex.Replace(odds, "\n", "");
+                    odds = Regex.Replace(odds, "\r", "");
+                    odds = Regex.Replace(odds, "\t", "");
+
+                    return Ok(odds);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
+
             }
             catch (Exception ex)
             {

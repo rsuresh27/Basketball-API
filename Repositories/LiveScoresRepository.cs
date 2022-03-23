@@ -224,11 +224,11 @@ namespace Basketball_API.Repositories
 
                 var topPerformers = gameScoreContainer.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "") == "Scoreboard__Performers");
 
-                var playerNames = topPerformers.Descendants("span").Where(node => node.GetAttributeValue("class", "") == "Athlete__PlayerName");
+                var playerNames = topPerformers?.Descendants("span").Where(node => node.GetAttributeValue("class", "") == "Athlete__PlayerName");
 
-                var playerTeams = topPerformers.Descendants("span").Where(node => node.GetAttributeValue("class", "") == "Athlete__NameDetails ml2 clr-gray-04 di ns9");
+                var playerTeams = topPerformers?.Descendants("span").Where(node => node.GetAttributeValue("class", "") == "Athlete__NameDetails ml2 clr-gray-04 di ns9");
 
-                var topPerformersStats = topPerformers.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "Athlete__Stats mt2 clr-gray-04 ns9");
+                var topPerformersStats = topPerformers?.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "Athlete__Stats mt2 clr-gray-04 ns9");
 
                 //use expandoobject to create json 
                 dynamic final = new ExpandoObject();
@@ -241,27 +241,30 @@ namespace Basketball_API.Repositories
 
                 final.TopPerformers = new Dictionary<string, Dictionary<string, string>>();
 
-                //assign score to correct player
-                foreach (var player in playerNames)
+                //assign score to correct player if they exist on ESPN website 
+                if(topPerformers != null)
                 {
-                    final.TopPerformers.Add(player.InnerText, new Dictionary<string, string>());
-
-                    foreach (var stats in topPerformersStats)
+                    foreach (var player in playerNames)
                     {
-                        if (stats.ParentNode == player.ParentNode.ParentNode)
-                        {
-                            final.TopPerformers[player.InnerText] = stats.Descendants("div").Where(node => node.ParentNode.ParentNode == player.ParentNode.ParentNode).AsEnumerable().ToDictionary(node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "ml2").InnerText,
-                                                                                   node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "clr-gray-01 hs9").InnerText);
-                        }
-                    }
+                        final.TopPerformers.Add(player.InnerText, new Dictionary<string, string>());
 
-                    foreach (var team in playerTeams)
-                    {
-                        if (team.ParentNode == player.ParentNode)
+                        foreach (var stats in topPerformersStats)
                         {
-                            final.TopPerformers[player.InnerText].Add("TEAM", team.InnerText.Split('-').ElementAtOrDefault(1).Trim());
+                            if (stats.ParentNode == player.ParentNode.ParentNode)
+                            {
+                                final.TopPerformers[player.InnerText] = stats.Descendants("div").Where(node => node.ParentNode.ParentNode == player.ParentNode.ParentNode).AsEnumerable().ToDictionary(node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "ml2").InnerText,
+                                                                                       node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "clr-gray-01 hs9").InnerText);
+                            }
                         }
-                    }
+
+                        foreach (var team in playerTeams)
+                        {
+                            if (team.ParentNode == player.ParentNode)
+                            {
+                                final.TopPerformers[player.InnerText].Add("TEAM", team.InnerText.Split('-').ElementAtOrDefault(1).Trim());
+                            }
+                        }
+                    }              
                 }
 
                 return JsonSerializer.Serialize(final);
