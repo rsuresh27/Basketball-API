@@ -22,16 +22,22 @@ namespace Basketball_API.Base_Classes
 
             var startDate = dates.Descendants("li").FirstOrDefault(node => node.InnerText.Contains("NBA Regular Season") && node.InnerText.Contains("Start")).InnerText.Split(':').ElementAtOrDefault(0).Trim();
 
-            startDate = (startDate + " " + DateTime.UtcNow.AddYears(-1).Year);
+            if (DateTime.UtcNow.Month < 9)
+            {
+                startDate = (startDate + " " + DateTime.UtcNow.AddYears(-1).Year);
+            }
+            else
+            {
+                startDate = (startDate + " " + DateTime.UtcNow.Year);
+            }
 
             DateTime startDateConverted = DateTime.Parse(startDate).Date;
 
-            //var daysTillNextMondayStartDate = ((int)DayOfWeek.Monday - (int)startDateConverted.DayOfWeek + 7) % 7;
+            var daysTillNextMondayStartDate = (int)DayOfWeek.Monday - (int)startDateConverted.DayOfWeek + 7;
 
-            //var nextMondayStartDate = startDateConverted.AddDays(daysTillNextMondayStartDate);
+            var nextMondayStartDate = startDateConverted.AddDays(daysTillNextMondayStartDate);
 
-            //return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date.AddDays(5) - startDateConverted).TotalDays / 7));
-            return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date - startDateConverted).TotalDays / 7));
+            return Convert.ToString(Math.Ceiling((DateTime.UtcNow.Date - nextMondayStartDate).TotalDays / 7) + 1);
         }
     }
 }
