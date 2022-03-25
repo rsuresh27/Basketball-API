@@ -10,7 +10,6 @@ namespace Basketball_API.Repositories
 {
     public class StatLeadersRepository : StatLeadersBase, IStatLeadersRepository
     {
-
         public StatLeadersRepository(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
         #region Endpoints
@@ -249,6 +248,5 @@ namespace Basketball_API.Repositories
         }
 
         #endregion
-
     }
 }
