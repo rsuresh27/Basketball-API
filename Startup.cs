@@ -32,6 +32,7 @@ namespace Basketball_API
             services.AddScoped<IStatLeadersRepository, StatLeadersRepository>();
             services.AddScoped<ILiveScoresRepository, LiveScoresRepository>();
             services.AddScoped<IBettingRepository, BettingRepository>();
+            services.AddScoped<IInjuriesRepository, InjuriesRepository>();
 
             //httpclient factory
             services.AddHttpClient();
