@@ -51,7 +51,7 @@ namespace Basketball_API.Repositories
 
                 if (betting != null)
                 {
-                    return JsonSerializer.Serialize(await ConvertOddsDivToJson(betting)); 
+                    return JsonSerializer.Serialize(ConvertOddsDivToJson(betting)); 
                 }
                 else
                 {

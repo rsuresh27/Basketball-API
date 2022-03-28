@@ -20,11 +20,11 @@ namespace Basketball_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllInjuries()
+        public async Task<IActionResult> GetInjuries()
         {
             try
             {
-                return Ok(await _injuriesRepository.GetAllInjuries());
+                return Ok(await _injuriesRepository.GetInjuries());
             }
             catch (Exception ex)
             {

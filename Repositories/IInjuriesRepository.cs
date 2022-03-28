@@ -4,6 +4,6 @@ namespace Basketball_API.Repositories
 {
     public interface IInjuriesRepository
     {
-        public Task<string> GetAllInjuries(); 
+        public Task<string> GetInjuries(); 
     }
 }

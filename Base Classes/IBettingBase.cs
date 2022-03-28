@@ -6,6 +6,6 @@ namespace Basketball_API.Base_Classes
 {
     public interface IBettingBase
     {
-        public Task<ExpandoObject> ConvertOddsDivToJson(HtmlNode betting); 
+        public ExpandoObject ConvertOddsDivToJson(HtmlNode betting); 
     }
 }

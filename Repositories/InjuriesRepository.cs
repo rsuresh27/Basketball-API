@@ -18,16 +18,16 @@ namespace Basketball_API.Repositories
 
         #region Endpoints
 
-        public async Task<string> GetAllInjuries()
+        public async Task<string> GetInjuries()
         {
-            return await GetInjuriesAll();  
+            return await GetInjuriesNBA();  
         }
 
         #endregion
 
         #region Injuries Functions
 
-        private async Task<string> GetInjuriesAll()
+        private async Task<string> GetInjuriesNBA()
         {
             try
             {
@@ -83,7 +83,9 @@ namespace Basketball_API.Repositories
                         }
                     }
 
-                    return JsonSerializer.Serialize(allTeamInjuries);
+                    injuries.Injuries = allTeamInjuries; 
+
+                    return JsonSerializer.Serialize(injuries);
                 }
 
                 else
@@ -98,7 +100,6 @@ namespace Basketball_API.Repositories
                 throw new Exception(ex.Message, ex); 
             }
         }
-
 
         #endregion
     }

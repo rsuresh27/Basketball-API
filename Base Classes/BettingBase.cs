@@ -12,7 +12,7 @@ namespace Basketball_API.Base_Classes
     {
         protected BettingBase(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
-        public Task<ExpandoObject> ConvertOddsDivToJson(HtmlNode betting)
+        public ExpandoObject ConvertOddsDivToJson(HtmlNode betting)
         {
             try
             {
@@ -63,7 +63,7 @@ namespace Basketball_API.Base_Classes
 
                 odds.Teams = teamOdds;
 
-                return Task.FromResult<ExpandoObject>(odds);
+                return odds;
             }
 
             catch (Exception ex)
