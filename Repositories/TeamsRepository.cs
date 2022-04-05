@@ -33,6 +33,11 @@ namespace Basketball_API.Repositories
             return await GetTransactionsNBA(team, year);
         }
 
+        public async Task<string> GetContracts(string team)
+        {
+            return await GetContractsNBA(team); 
+        }
+
         #endregion
 
         #region Team Functions
@@ -245,6 +250,58 @@ namespace Basketball_API.Repositories
             catch (Exception ex)
             {
                 throw new Exception(ex.Message, ex);
+            }
+        }
+
+        private async Task<string> GetContractsNBA(string team)
+        {
+            try
+            {
+                var url = $"https://www.basketball-reference.com";
+
+                HtmlDocument htmlDocument = new HtmlDocument();
+
+                htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+
+                var content = htmlDocument.GetElementbyId("content");
+
+                var teamsList = content.Descendants("select").FirstOrDefault(node => node.Id == "select_team").Descendants("option");
+
+                var teamName = teamsList.FirstOrDefault(node => node.InnerText.ToLower() == team.ToLower()).GetAttributeValue("value", "").Split('/').ElementAtOrDefault(2);
+
+                var contractsUrl = $"https://www.basketball-reference.com/contracts/{teamName}.html";
+
+                htmlDocument.LoadHtml(await LoadWebPageAsString(contractsUrl)); 
+
+                var contractsContent = htmlDocument.GetElementbyId("content");  
+
+                var contractsTable = contractsContent.Descendants("table").FirstOrDefault(node => node.Id == "contracts");
+
+                var teamContracts = contractsTable.Descendants("tr");
+
+                dynamic contracts = new ExpandoObject(); 
+
+                if(teamContracts != null)
+                {
+                    var teamContractKeys = teamContracts.FirstOrDefault(node => node.GetAttributeValue("class", "") != "over_header" && node.XPath.Contains("th")).Descendants("th").AsEnumerable();
+
+                    var teamContractValues = teamContracts.Where(node => node.InnerText != "" && !node.XPath.Contains("thead"));
+
+                    contracts.Contracts = new List<Dictionary<string, string>>(); 
+
+                    foreach(var contractValue in teamContractValues)
+                    {
+                        var playerContract = teamContractKeys.Zip(contractValue.ChildNodes, (key, value) => new KeyValuePair<string, string>(key.InnerText, value.InnerText)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value); 
+
+                        contracts.Contracts.Add(playerContract);
+                    }
+                }
+
+                return JsonSerializer.Serialize(contracts); 
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message, ex); 
             }
         }
 

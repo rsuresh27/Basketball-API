@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions; 
 
 namespace Basketball_API.Controllers
 {
@@ -65,9 +66,8 @@ namespace Basketball_API.Controllers
             }
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> GetTransactions(string team, string year)
+        public async Task<IActionResult> GetTransactions(string team, string year = null)
         {
             try
             {
@@ -80,6 +80,31 @@ namespace Basketball_API.Controllers
                 {
                     return BadRequest();
                 }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in getting stats: {ex.Message}");
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetContracts(string team)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(team))
+                {
+                    var contracts = await _teamsRepository.GetContracts(team);
+                    return Ok(contracts); 
+                }
+                else
+                {
+                    return BadRequest(); 
+                }
+
+     
 
             }
             catch (Exception ex)
