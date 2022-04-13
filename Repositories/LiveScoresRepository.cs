@@ -107,7 +107,7 @@ namespace Basketball_API.Repositories
                 //use expandoobject to create json 
                 dynamic final = new ExpandoObject();
 
-                var gameDescription = gameScore.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Notes"))?.InnerText;
+                var gameDescription = gameScore.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreboardScoreCell__Note"))?.InnerText;
 
                 final.Time = (await GameTime(gameID)) + (!string.IsNullOrEmpty(gameDescription) ? ", " + gameDescription : "");
 
