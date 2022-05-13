@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions; 
 
 namespace Basketball_API.Base_Classes
 {
@@ -52,6 +53,8 @@ namespace Basketball_API.Base_Classes
 
             var scoreboardWinner = scoreboardScoreContainer.Descendants("svg").FirstOrDefault(node => node.GetAttributeValue("class", "") == "ScoreboardScoreCell__WinnerIcon absolute icon__svg");
 
+            var scoreboardGameDescription = scoreboardScoreContainer.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreboardScoreCell__Note"))?.InnerText; 
+
             var gamecastPage = gamecast.GetElementbyId("global-viewport");
 
             var gamecastScoreContainer = gamecastPage.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("competitors"));
@@ -66,6 +69,26 @@ namespace Basketball_API.Base_Classes
                 {
                     if (scoreboardWinner != null && gamecastWinner.Contains("winner"))
                     {
+                        //verify the series record is updated if it is a playoff/finals game
+                        if (!string.IsNullOrEmpty(scoreboardGameDescription) && scoreboardGameDescription.ToLower().Contains("game"))
+                        {
+                            var numbers = scoreboardGameDescription.Where(ch => char.IsDigit(ch)).Select(number => Convert.ToInt32(number)); 
+                            var currentGame = numbers.ElementAtOrDefault(0);
+                            var winningRecord = numbers.ElementAtOrDefault(1);
+                            var losingRecord = numbers.ElementAtOrDefault(2);
+
+                            if(currentGame == winningRecord + losingRecord)
+                            {
+                                return new Tuple<ValidatedScore, HtmlDocument>(ValidatedScore.Validated, scoreboard);
+                            }
+
+                            else
+                            {
+                                return new Tuple<ValidatedScore, HtmlDocument>(ValidatedScore.NotValidated, scoreboard);
+                            }
+
+                        }
+
                         return new Tuple<ValidatedScore, HtmlDocument>(ValidatedScore.Validated, scoreboard);
                     }
 
