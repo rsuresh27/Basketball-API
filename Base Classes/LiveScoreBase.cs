@@ -72,7 +72,7 @@ namespace Basketball_API.Base_Classes
                         //verify the series record is updated if it is a playoff/finals game
                         if (!string.IsNullOrEmpty(scoreboardGameDescription) && scoreboardGameDescription.ToLower().Contains("game"))
                         {
-                            var numbers = scoreboardGameDescription.Where(ch => char.IsDigit(ch)).Select(number => Convert.ToInt32(number)); 
+                            var numbers = scoreboardGameDescription.Where(ch => char.IsDigit(ch)).Select(number => Convert.ToInt32(number.ToString())); 
                             var currentGame = numbers.ElementAtOrDefault(0);
                             var winningRecord = numbers.ElementAtOrDefault(1);
                             var losingRecord = numbers.ElementAtOrDefault(2);
