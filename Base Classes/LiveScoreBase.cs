@@ -21,11 +21,11 @@ namespace Basketball_API.Base_Classes
 
             htmlDocument.LoadHtml(await LoadWebPageAsString(url));
 
-            var page = htmlDocument.GetElementbyId("global-viewport").ChildNodes;
+            var page = htmlDocument.DocumentNode.Descendants();
 
-            var content = page.FirstOrDefault(node => node.Id == "pane-main");
+            //var content = page.FirstOrDefault(node => node.Id == "pane-main");
 
-            var time = content.Descendants().FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("status-detail"));
+            var time = page.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Time"));
 
             return time.InnerText;
         }
@@ -47,7 +47,16 @@ namespace Basketball_API.Base_Classes
 
             var scoreboardGames = scoreboardPage.Descendants("section").FirstOrDefault(node => node.GetAttributeValue("class", "") == "Scoreboard bg-clr-white flex flex-auto justify-between" && node.Id == gameID);
 
-            var scoreboardScoreContainer = scoreboardPage.Descendants("div").Where(node => node.GetAttributeValue("class", "") == "Scoreboard__RowContainer flex flex-column flex-auto" && node.ParentNode.Id == gameID).FirstOrDefault();
+            var scoreboardScoreContainer = scoreboardPage.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("Scoreboard__RowContainer") && node.ParentNode.Id == gameID);
+
+            var x = scoreboardPage.Descendants("div"); 
+
+            foreach(var y in x.Where(node => node.GetAttributeValue("class", "").Contains("Scoreboard__RowContainer")))
+            {
+                var yclass = y.GetAttributeValue("class", ""); 
+                var parentNodeID = y.ParentNode.Id; 
+                Console.WriteLine(y); 
+            }
 
             var scoreboardScores = scoreboardScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Score h4")).Select(node => node.InnerText).OrderBy(score => score);
 
@@ -57,11 +66,11 @@ namespace Basketball_API.Base_Classes
 
             var gamecastPage = gamecast.GetElementbyId("global-viewport");
 
-            var gamecastScoreContainer = gamecastPage.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("competitors"));
+            var gamecastScoreContainer = gamecast.DocumentNode.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("Gamestrip__Competitors"));
 
-            var gamecastScores = gamecastScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("score icon-font")).Select(node => node.InnerText).OrderBy(score => score);
+            var gamecastScores = gamecastScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("Gamestrip__Score relative")).Select(node => node.InnerText).OrderBy(score => score);
 
-            var gamecastWinner = gamecastScoreContainer.ParentNode.GetAttributeValue("class", "");
+            var gamecastWinner = gamecastScoreContainer.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("winner")).GetAttributeValue("class", "");
 
             if (scoreboardScores.SequenceEqual(gamecastScores))
             {
