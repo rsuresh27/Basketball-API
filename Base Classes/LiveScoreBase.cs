@@ -70,13 +70,13 @@ namespace Basketball_API.Base_Classes
 
             var gamecastScores = gamecastScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("Gamestrip__Score relative")).Select(node => node.InnerText).OrderBy(score => score);
 
-            var gamecastWinner = gamecastScoreContainer.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("winner")).GetAttributeValue("class", "");
+            var gamecastWinner = gamecastScoreContainer.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("winner")); 
 
             if (scoreboardScores.SequenceEqual(gamecastScores))
             {
-                if (scoreboardWinner != null || gamecastWinner.Contains("winner"))
+                if (scoreboardWinner != null || gamecastWinner != null)
                 {
-                    if (scoreboardWinner != null && gamecastWinner.Contains("winner"))
+                    if (scoreboardWinner != null && gamecastWinner.GetAttributeValue("class", "").Contains("winner"))
                     {
                         //verify the series record is updated if it is a playoff/finals game
                         if (!string.IsNullOrEmpty(scoreboardGameDescription) && scoreboardGameDescription.ToLower().Contains("game"))
@@ -85,6 +85,8 @@ namespace Basketball_API.Base_Classes
                             var currentGame = numbers.ElementAtOrDefault(0);
                             var winningRecord = numbers.ElementAtOrDefault(1);
                             var losingRecord = numbers.ElementAtOrDefault(2);
+
+                            
 
                             if(currentGame == winningRecord + losingRecord)
                             {

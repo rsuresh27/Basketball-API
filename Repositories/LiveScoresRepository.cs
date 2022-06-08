@@ -124,8 +124,8 @@ namespace Basketball_API.Repositories
                     {
                         if (stats.ParentNode == player.ParentNode.ParentNode)
                         {
-                            final.TopPerformers[player.InnerText] = stats.Descendants("div").Where(node => node.ParentNode.ParentNode == player.ParentNode.ParentNode).AsEnumerable().ToDictionary(node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("--label")).InnerText,
-                                                                                   node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("clr-gray-01 hs9")).InnerText);
+                            final.TopPerformers[player.InnerText] = stats.Descendants("div").Where(node => node.ParentNode.ParentNode == player.ParentNode.ParentNode).AsEnumerable().ToDictionary(node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("label")).InnerText,
+                                                                                   node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("value")).InnerText);
                         }
                     }
 
@@ -254,8 +254,8 @@ namespace Basketball_API.Repositories
                         {
                             if (stats.ParentNode == player.ParentNode.ParentNode)
                             {
-                                final.TopPerformers[player.InnerText] = stats.Descendants("div").Where(node => node.ParentNode.ParentNode == player.ParentNode.ParentNode).AsEnumerable().ToDictionary(node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "ml2").InnerText,
-                                                                                       node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "") == "clr-gray-01 hs9").InnerText);
+                                final.TopPerformers[player.InnerText] = stats.Descendants("div").Where(node => node.ParentNode.ParentNode == player.ParentNode.ParentNode).AsEnumerable().ToDictionary(node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("label")).InnerText,
+                                                                                       node => node.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("value")).InnerText);
                             }
                         }
 
