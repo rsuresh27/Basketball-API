@@ -3,7 +3,12 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions; 
+using System.Text.RegularExpressions;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers; 
 
 namespace Basketball_API.Base_Classes
 {
@@ -17,17 +22,31 @@ namespace Basketball_API.Base_Classes
         {
             var url = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
 
-            HtmlDocument htmlDocument = new HtmlDocument();
+            var options = new ChromeOptions();
+            options.AddArguments("--headless");           
 
-            htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+            IWebDriver webDriver = new ChromeDriver(options);
 
-            var page = htmlDocument.DocumentNode.Descendants();
+            webDriver.Navigate().GoToUrl(url);
 
-            //var content = page.FirstOrDefault(node => node.Id == "pane-main");
+            var wait = new WebDriverWait(webDriver, new TimeSpan(0,0,1));
+            wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")));
 
-            var time = page.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Time"));
+            var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")); 
 
-            return time.InnerText;
+            return element.Text;
+
+            //HtmlDocument htmlDocument = new HtmlDocument();
+
+            //htmlDocument.LoadHtml(await LoadWebPageAsString(url));
+
+            //var page = htmlDocument.DocumentNode.Descendants();
+
+            ////var content = page.FirstOrDefault(node => node.Id == "pane-main");
+
+            //var time = page.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Time"));
+
+            //return time.InnerText;
         }
 
         public async Task<Tuple<ValidatedScore, HtmlDocument>> ValidateScore(string gameID, string today)
@@ -49,20 +68,20 @@ namespace Basketball_API.Base_Classes
 
             var scoreboardScoreContainer = scoreboardPage.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("Scoreboard__RowContainer") && node.ParentNode.Id == gameID);
 
-            var x = scoreboardPage.Descendants("div"); 
+            var x = scoreboardPage.Descendants("div");
 
-            foreach(var y in x.Where(node => node.GetAttributeValue("class", "").Contains("Scoreboard__RowContainer")))
+            foreach (var y in x.Where(node => node.GetAttributeValue("class", "").Contains("Scoreboard__RowContainer")))
             {
-                var yclass = y.GetAttributeValue("class", ""); 
-                var parentNodeID = y.ParentNode.Id; 
-                Console.WriteLine(y); 
+                var yclass = y.GetAttributeValue("class", "");
+                var parentNodeID = y.ParentNode.Id;
+                Console.WriteLine(y);
             }
 
             var scoreboardScores = scoreboardScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("ScoreCell__Score h4")).Select(node => node.InnerText).OrderBy(score => score);
 
             var scoreboardWinner = scoreboardScoreContainer.Descendants("svg").FirstOrDefault(node => node.GetAttributeValue("class", "") == "ScoreboardScoreCell__WinnerIcon absolute icon__svg");
 
-            var scoreboardGameDescription = scoreboardScoreContainer.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreboardScoreCell__Note"))?.InnerText; 
+            var scoreboardGameDescription = scoreboardScoreContainer.Descendants("div").FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("ScoreboardScoreCell__Note"))?.InnerText;
 
             var gamecastPage = gamecast.GetElementbyId("global-viewport");
 
@@ -70,7 +89,7 @@ namespace Basketball_API.Base_Classes
 
             var gamecastScores = gamecastScoreContainer.Descendants("div").Where(node => node.GetAttributeValue("class", "").Contains("Gamestrip__Score relative")).Select(node => node.InnerText).OrderBy(score => score);
 
-            var gamecastWinner = gamecastScoreContainer.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("winner")); 
+            var gamecastWinner = gamecastScoreContainer.ChildNodes.FirstOrDefault(node => node.GetAttributeValue("class", "").Contains("winner"));
 
             if (scoreboardScores.SequenceEqual(gamecastScores))
             {
@@ -81,14 +100,14 @@ namespace Basketball_API.Base_Classes
                         //verify the series record is updated if it is a playoff/finals game
                         if (!string.IsNullOrEmpty(scoreboardGameDescription) && scoreboardGameDescription.ToLower().Contains("game"))
                         {
-                            var numbers = scoreboardGameDescription.Where(ch => char.IsDigit(ch)).Select(number => Convert.ToInt32(number.ToString())); 
+                            var numbers = scoreboardGameDescription.Where(ch => char.IsDigit(ch)).Select(number => Convert.ToInt32(number.ToString()));
                             var currentGame = numbers.ElementAtOrDefault(0);
                             var winningRecord = numbers.ElementAtOrDefault(1);
                             var losingRecord = numbers.ElementAtOrDefault(2);
 
-                            
 
-                            if(currentGame == winningRecord + losingRecord)
+
+                            if (currentGame == winningRecord + losingRecord)
                             {
                                 return new Tuple<ValidatedScore, HtmlDocument>(ValidatedScore.Validated, scoreboard);
                             }
