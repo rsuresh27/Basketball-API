@@ -8,7 +8,8 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support;
 using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers; 
+using SeleniumExtras.WaitHelpers;
+using OpenQA.Selenium.Remote; 
 
 namespace Basketball_API.Base_Classes
 {
@@ -23,18 +24,21 @@ namespace Basketball_API.Base_Classes
             var url = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
 
             var options = new ChromeOptions();
-            options.AddArguments("--headless");           
+            options.AddArgument("no-sandbox");
+            options.AddArguments("--headless");
 
-            IWebDriver webDriver = new ChromeDriver(options);
+            IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium:4444"), options);  
 
             webDriver.Navigate().GoToUrl(url);
 
             var wait = new WebDriverWait(webDriver, new TimeSpan(0,0,1));
             wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")));
 
-            var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")); 
+            var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01"));
 
-            return element.Text;
+            var text = element.Text;
+
+            return text;
 
             //HtmlDocument htmlDocument = new HtmlDocument();
 
