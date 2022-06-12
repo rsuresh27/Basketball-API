@@ -27,7 +27,7 @@ namespace Basketball_API.Base_Classes
             options.AddArgument("no-sandbox");
             options.AddArguments("--headless");
 
-            IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-service.bball-api-namespace.svc.clusterset.local"), options);  
+            IWebDriver webDriver = new RemoteWebDriver(new Uri("http://10.79.128.40:4444"), options);  
 
             webDriver.Navigate().GoToUrl(url);
 
