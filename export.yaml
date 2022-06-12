@@ -1,0 +1,6 @@
+﻿# export.yaml
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: bball-api-namespace
+ name: selenium-service
