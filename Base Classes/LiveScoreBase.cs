@@ -28,7 +28,7 @@ namespace Basketball_API.Base_Classes
             options.AddArguments("--headless");
             options.AddArgument("--disable-gpu");         
 
-            using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium:4444"), options))
+            using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-service:4444"), options))
             { 
                 webDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
 
