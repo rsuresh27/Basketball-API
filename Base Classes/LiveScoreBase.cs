@@ -26,19 +26,23 @@ namespace Basketball_API.Base_Classes
             var options = new ChromeOptions();
             options.AddArgument("no-sandbox");
             options.AddArguments("--headless");
+            options.AddArgument("--disable-gpu");         
 
-            IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-service:4444"), options);  
+            using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium:4444"), options))
+            { 
+                webDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
 
-            webDriver.Navigate().GoToUrl(url);
+                webDriver.Navigate().GoToUrl(url);
 
-            var wait = new WebDriverWait(webDriver, new TimeSpan(0,0,1));
-            wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")));
+                var wait = new WebDriverWait(webDriver, new TimeSpan(0, 3, 0));
+                wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")));
 
-            var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01"));
+                var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01"));
 
-            var text = element.Text;
+                var text = element.Text;
 
-            return text;
+                return text;
+            }         
 
             //HtmlDocument htmlDocument = new HtmlDocument();
 
