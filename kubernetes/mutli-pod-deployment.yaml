@@ -1,0 +1,24 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bball-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bball-api
+  template:
+    metadata:
+      labels:
+        app: bball-api
+    spec:
+      restartPolicy: Always
+      containers: 
+      - name: api
+        image: us-central1-docker.pkg.dev/basketball-api-340719/api/api
+        ports:
+        - containerPort: 5000   
+      - name: selenium
+        image: "selenium/standalone-chrome:4.2.2-20220609"
+        ports:
+        - containerPort: 4444
