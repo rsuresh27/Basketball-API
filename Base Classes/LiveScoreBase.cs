@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
-using OpenQA.Selenium.Remote; 
+using OpenQA.Selenium.Remote;
+using System.Collections.Generic; 
 
 namespace Basketball_API.Base_Classes
 {
@@ -23,13 +26,34 @@ namespace Basketball_API.Base_Classes
         {
             var url = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
 
-            var options = new ChromeOptions();
-            options.AddArgument("no-sandbox");
-            options.AddArguments("--headless");
-            options.AddArgument("--disable-gpu");         
+            var chromeOptions = new ChromeOptions();
+            chromeOptions.AddArgument("no-sandbox");
+            chromeOptions.AddArguments("--headless");
+            chromeOptions.AddArgument("--disable-gpu");
+            chromeOptions.AddArgument("--disable-dev-shm-usage");
 
-            using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://localhost:4444"), options))
-            { 
+            var firefoxOptions = new FirefoxOptions();
+            firefoxOptions.AddArgument("no-sandbox");
+            firefoxOptions.AddArguments("--headless");
+            firefoxOptions.AddArgument("--disable-gpu");
+            firefoxOptions.AddArgument("--disable-dev-shm-usage");
+
+            var edgeOptions = new EdgeOptions();
+            edgeOptions.AddArgument("no-sandbox");
+            edgeOptions.AddArguments("--headless");
+            edgeOptions.AddArgument("--disable-gpu");
+            edgeOptions.AddArgument("--disable-dev-shm-usage"); 
+
+
+            List<DriverOptions> options = new List<DriverOptions>();
+            options.Add(chromeOptions);
+            options.Add(firefoxOptions);
+            options.Add(edgeOptions);
+
+            var random = new Random();
+
+            using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), options.ElementAtOrDefault(random.Next(options.Count))))
+            {
                 webDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
 
                 webDriver.Navigate().GoToUrl(url);
