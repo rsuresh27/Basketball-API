@@ -24,49 +24,56 @@ namespace Basketball_API.Base_Classes
 
         public async Task<string> GameTime(string gameID)
         {
-            var url = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
 
-            var chromeOptions = new ChromeOptions();
-            chromeOptions.AddArgument("no-sandbox");
-            chromeOptions.AddArguments("--headless");
-            chromeOptions.AddArgument("--disable-gpu");
-            chromeOptions.AddArgument("--disable-dev-shm-usage");
-
-            var firefoxOptions = new FirefoxOptions();
-            firefoxOptions.AddArgument("no-sandbox");
-            firefoxOptions.AddArguments("--headless");
-            firefoxOptions.AddArgument("--disable-gpu");
-            firefoxOptions.AddArgument("--disable-dev-shm-usage");
-
-            var edgeOptions = new EdgeOptions();
-            edgeOptions.AddArgument("no-sandbox");
-            edgeOptions.AddArguments("--headless");
-            edgeOptions.AddArgument("--disable-gpu");
-            edgeOptions.AddArgument("--disable-dev-shm-usage"); 
-
-
-            List<DriverOptions> options = new List<DriverOptions>();
-            options.Add(chromeOptions);
-            options.Add(firefoxOptions);
-            options.Add(edgeOptions);
-
-            var random = new Random();
-
-            using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-hub:4444/wd/hub"), options.ElementAtOrDefault(random.Next(options.Count))))
+            return await Task.Run(() =>
             {
-                webDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
+                {
 
-                webDriver.Navigate().GoToUrl(url);
+                    var url = $"https://www.espn.com/nba/game/_/gameId/{gameID}";
 
-                var wait = new WebDriverWait(webDriver, new TimeSpan(0, 3, 0));
-                wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")));
+                    var chromeOptions = new ChromeOptions();
+                    chromeOptions.AddArgument("no-sandbox");
+                    chromeOptions.AddArguments("--headless");
+                    chromeOptions.AddArgument("--disable-gpu");
+                    chromeOptions.AddArgument("--disable-dev-shm-usage");
 
-                var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01"));
+                    var firefoxOptions = new FirefoxOptions();
+                    firefoxOptions.AddArgument("no-sandbox");
+                    firefoxOptions.AddArguments("--headless");
+                    firefoxOptions.AddArgument("--disable-gpu");
+                    firefoxOptions.AddArgument("--disable-dev-shm-usage");
 
-                var text = element.Text;
+                    var edgeOptions = new EdgeOptions();
+                    edgeOptions.AddArgument("no-sandbox");
+                    edgeOptions.AddArguments("--headless");
+                    edgeOptions.AddArgument("--disable-gpu");
+                    edgeOptions.AddArgument("--disable-dev-shm-usage");
 
-                return text;
-            }         
+
+                    List<DriverOptions> options = new List<DriverOptions>();
+                    options.Add(chromeOptions);
+                    options.Add(firefoxOptions);
+                    options.Add(edgeOptions);
+
+                    var random = new Random();
+
+                    using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-router:4444/wd/hub"), options.ElementAtOrDefault(random.Next(options.Count))))
+                    {
+                        webDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
+
+                        webDriver.Navigate().GoToUrl(url);
+
+                        var wait = new WebDriverWait(webDriver, new TimeSpan(0, 3, 0));
+                        wait.Until(ExpectedConditions.ElementExists(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01")));
+
+                        var element = webDriver.FindElement(By.CssSelector(".ScoreCell__Time.Gamestrip__Time.h9.clr-gray-01"));
+
+                        var text = element.Text;
+
+                        return text;
+                    }
+                }
+            });
 
             //HtmlDocument htmlDocument = new HtmlDocument();
 
