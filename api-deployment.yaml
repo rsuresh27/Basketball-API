@@ -24,7 +24,7 @@ spec:
         io.kompose.service: api
     spec:
       containers:
-        - image: gcr.io/basketball-api-340719/github.com/rsuresh27/basketball-api:bd0b4a7c4f0370ff541966977b3b01b801d254e3
+        - image: us-central1-docker.pkg.dev/basketball-api-340719/api/api:latest
           name: api
           ports:
             - containerPort: 80
