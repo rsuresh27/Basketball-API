@@ -57,7 +57,7 @@ namespace Basketball_API.Base_Classes
 
                     var random = new Random();
 
-                    using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-router:4444/wd/hub"), options.ElementAtOrDefault(random.Next(options.Count))))
+                    using (IWebDriver webDriver = new RemoteWebDriver(new Uri("http://selenium-hub:4444/wd/hub"), options.ElementAtOrDefault(random.Next(options.Count))))
                     {
                         webDriver.Manage().Timeouts().PageLoad.Add(TimeSpan.FromSeconds(30));
 
