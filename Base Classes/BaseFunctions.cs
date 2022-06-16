@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Text;
+using System.Text.Json; 
 
 namespace Basketball_API.Base_Classes
 {
@@ -42,6 +44,45 @@ namespace Basketball_API.Base_Classes
                             {
                                 var webPage = await httpContent.ReadAsStringAsync();
                                 return webPage;
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("An error occurred getting the data, please check you typed the input parameters correctly or try again later");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+        }
+
+        public async Task<string> PuppeteerServerRequest(string url)
+        {
+            try
+            {
+                using (HttpClient client = _httpClientFactory.CreateClient())
+                {
+                    using (HttpResponseMessage httpResponse = await client.GetAsync(url))
+                    {
+                        httpResponse.Headers.CacheControl = new CacheControlHeaderValue
+                        {
+                            NoCache = true,
+                            NoStore = true,
+                            MustRevalidate = true
+                        };
+
+                        httpResponse.Headers.Pragma.ParseAdd("no-cache");
+                        httpResponse.Content?.Headers.TryAddWithoutValidation("Expires", "0");
+
+                        if (httpResponse.IsSuccessStatusCode)
+                        {
+                            using (HttpContent httpContent = httpResponse.Content)
+                            {
+                                var json = await httpContent.ReadAsStringAsync();
+                                return JsonSerializer.Deserialize<string>(json); 
                             }
                         }
                         else

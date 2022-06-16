@@ -7,6 +7,8 @@ namespace Basketball_API.Base_Classes
     {
         public Task<string> LoadWebPageAsString(string url);
 
+        public Task<string> PuppeteerServerRequest(string url);
+
         public HtmlNodeCollection GetChildNodes(HtmlNodeCollection htmlNodes, string divID);
     }
 }

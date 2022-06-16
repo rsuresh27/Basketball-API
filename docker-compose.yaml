@@ -4,6 +4,7 @@ services:
     build: .
     ports:
       - "5000:80"
+
   selenium-event-bus:
     image: selenium/event-bus:4.2.2-20220609
     container_name: selenium-event-bus

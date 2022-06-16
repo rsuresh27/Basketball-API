@@ -33,7 +33,11 @@ spec:
             value: "4443"
           - name: SE_EVENT_BUS_PUBLISH_PORT
             value: "4442"
+          - name: SE_NODE_MAX_SESSIONS
+            value: "10"
+          - name: SE_NODE_OVERRIDE_MAX_SESSIONS
+            value: "true"
         resources:
           limits:
-            memory: "1000Mi"
+            memory: "1100Mi"
             cpu: ".5"

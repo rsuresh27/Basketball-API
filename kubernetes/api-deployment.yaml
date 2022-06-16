@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: bball-api
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: bball-api
@@ -18,4 +18,3 @@ spec:
         image: us-central1-docker.pkg.dev/basketball-api-340719/api/api:latest
         ports:
         - containerPort: 5000   
-            
