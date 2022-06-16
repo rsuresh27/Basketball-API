@@ -23,7 +23,9 @@ namespace Basketball_API.Base_Classes
         #region Live Scores
 
         public async Task<string> GameTime(string gameID)
-        {            
+        {
+            Console.WriteLine("Getting game time");
+
             var puppeteerSeverNBAURL = Environment.GetEnvironmentVariable("PUPPETEER_SERVER_NBA");     
 
             var url = $"{puppeteerSeverNBAURL}?gameID={gameID}"; 
@@ -31,6 +33,8 @@ namespace Basketball_API.Base_Classes
             Console.WriteLine(url);
 
             var currentGameTime = await PuppeteerServerRequest(url);
+
+            Console.WriteLine(currentGameTime); 
 
             return currentGameTime; 
 

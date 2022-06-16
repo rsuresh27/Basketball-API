@@ -63,6 +63,8 @@ namespace Basketball_API.Base_Classes
         {
             try
             {
+                Console.WriteLine("GETTING URL " + url); 
+
                 using (HttpClient client = _httpClientFactory.CreateClient())
                 {
                     using (HttpResponseMessage httpResponse = await client.GetAsync(url))
