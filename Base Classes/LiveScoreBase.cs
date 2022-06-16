@@ -24,20 +24,13 @@ namespace Basketball_API.Base_Classes
 
         public async Task<string> GameTime(string gameID)
         {
-            Console.WriteLine("Getting game time");
-
             var puppeteerSeverNBAURL = Environment.GetEnvironmentVariable("PUPPETEER_SERVER_NBA");     
 
             var url = $"{puppeteerSeverNBAURL}?gameID={gameID}"; 
 
-            Console.WriteLine(url);
-
             var currentGameTime = await PuppeteerServerRequest(url);
 
-            Console.WriteLine(currentGameTime); 
-
             return currentGameTime; 
-
         }
 
         public async Task<Tuple<ValidatedScore, HtmlDocument>> ValidateScore(string gameID, string today)

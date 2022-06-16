@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Text;
-using System.Text.Json; 
+using System.Text.Json;
 
 namespace Basketball_API.Base_Classes
 {
@@ -63,8 +63,6 @@ namespace Basketball_API.Base_Classes
         {
             try
             {
-                Console.WriteLine("GETTING URL " + url); 
-
                 using (HttpClient client = _httpClientFactory.CreateClient())
                 {
                     using (HttpResponseMessage httpResponse = await client.GetAsync(url))
@@ -84,7 +82,7 @@ namespace Basketball_API.Base_Classes
                             using (HttpContent httpContent = httpResponse.Content)
                             {
                                 var json = await httpContent.ReadAsStringAsync();
-                                return JsonSerializer.Deserialize<string>(json); 
+                                return JsonSerializer.Deserialize<string>(json);
                             }
                         }
                         else
