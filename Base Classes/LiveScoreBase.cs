@@ -24,7 +24,7 @@ namespace Basketball_API.Base_Classes
 
         public async Task<string> GameTime(string gameID)
         {
-            var puppeteerSeverNBAURL = Environment.GetEnvironmentVariable("PUPPETEER_SERVER_NBA");     
+            var puppeteerSeverNBAURL = Environment.GetEnvironmentVariable("PUPPETEER_SERVER_NBA");
 
             var url = $"{puppeteerSeverNBAURL}?gameID={gameID}"; 
 

@@ -2,10 +2,15 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json; 
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Text;
 using System.Text.Json;
+using System.Dynamic;
+using System.Collections.Generic;
+using Basketball_API.Models; 
+
 
 namespace Basketball_API.Base_Classes
 {
@@ -81,8 +86,9 @@ namespace Basketball_API.Base_Classes
                         {
                             using (HttpContent httpContent = httpResponse.Content)
                             {
-                                var json = await httpContent.ReadAsStringAsync();
-                                return JsonSerializer.Deserialize<string>(json);
+                                var jsonResponse = await httpContent.ReadAsStringAsync();
+                                dynamic json = JsonSerializer.Deserialize<GameTime>(jsonResponse); 
+                                return json.Time;
                             }
                         }
                         else
